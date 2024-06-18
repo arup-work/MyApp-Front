@@ -7,7 +7,7 @@ export const AuthProvider = ( { children }) => {
     const [auth, setAuth] = useState({ token : null, user: null});
 
     // Function to login
-    const login = (token, user) => {
+    const login = (token, user) => { 
             setAuth({ token, user });
             localStorage.setItem('token' , token); //Store token into local storage
             localStorage.setItem('user', JSON.stringify(user)); //Store user details into local storage
