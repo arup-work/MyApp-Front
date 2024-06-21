@@ -1,6 +1,9 @@
-import React, { useCallback, useContext, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../contexts/AuthContext";
 import { useDropzone } from "react-dropzone";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from "react-router-dom";
 
 const Create = () => {
     const { auth } = useContext(AuthContext);
@@ -9,6 +12,8 @@ const Create = () => {
     const [img, setImg] = useState('');
     const [imgPreview, setImgPreview] = useState(null);
     const [errors, setErrors] = useState({});
+    const navigate = useNavigate();
+
 
     const validateForm = () => {
         const newErrors = {};
@@ -51,15 +56,53 @@ const Create = () => {
         onDrop
     });
 
-    const handleCreatePost = (e) => {
+    const handleCreatePost = async(e) => {
         e.preventDefault();
         if (validateForm()) {
-            console.log("Everything is fine");
-            console.log(title, desc, img);
+            const formData = new FormData();
+            formData.append('title',title);
+            formData.append('description',desc);
+            formData.append('file',img);
+
+            try {
+                const response = await fetch('http://127.0.0.1:3000/api/v1/post',{
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    toast.success(data.message,{
+                        position: "top-right",
+                        className: 'foo-bar'
+                    });
+                    // Reset form
+                    setTitle('');
+                    setDesc('');
+                    setImg('');
+                    setErrors({});
+                    setImgPreview(null);
+
+                    navigate('/post', {
+                        state : {
+                            message :  data.message, type : 'success' 
+                        }
+                    });
+                }else{
+                    toast.error(data.message, {
+                        position: "top-right",
+                        className: 'foo-bar'
+                    });
+                }
+            } catch (error) {
+                setErrors('An error occurred. Please try again later.');
+            }
         }
     }
+
     return (
         <div className="container">
+             <ToastContainer />
             <div className="row justify-content-center mt-5">
                 <div className="col-8">
                     <div className="card">

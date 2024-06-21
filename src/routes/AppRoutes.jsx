@@ -6,6 +6,7 @@ import RegisterPage from '../components/Auth/RegisterPage';
 import Index from "../views/Dashboard/LandingPAge/Index";
 import ProfileIndex from "../views/Dashboard/MyProfile/Index";
 import Create from "../views/Post/Create";
+import PostIndex from "../views/Post/Index";
 
 import ForgetPassword from '../components/Auth/ForgetPassword';
 import ResetPassword from '../components/Auth/ResetPassword';
@@ -44,8 +45,12 @@ const AppRoutes = () => {
             />
 
             <Route 
-                path="/post"
+                path="/post/create"
                 element={auth.token ? <Create /> : <Navigate to="/login" />}
+            />
+            <Route 
+                path="/post"
+                element={auth.token ? <PostIndex /> : <Navigate to="/login" />}
             />
         </Routes>
     )
