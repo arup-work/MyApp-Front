@@ -1,11 +1,10 @@
 import React, { useState, useContext, useEffect } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import './LoginPage.css';
 import { Link, useLocation } from "react-router-dom";
 
+import '../../assets/styles/AuthPage.css'
 import { AuthContext } from "../../contexts/AuthContext";
-import apiRequest from "../../helpers/utils/api";
 import { showSuccessToast, showErrorToast } from "../../helpers/utils/toastUtils";
 import AuthService from "../../services/AuthService";
 
@@ -86,13 +85,13 @@ const LoginPage = () => {
             <h2>Login</h2>
             <form onSubmit={handleLogin}>
                 <div>
-                    <label htmlFor="email">Email: </label>
+                    <label htmlFor="email">Email </label>
                     <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} />
 
                     {errors.email && <span className="error">{errors.email}</span>}
                 </div>
                 <div>
-                    <label htmlFor="password">Password: </label>
+                    <label htmlFor="password">Password </label>
                     <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                     {errors.password && <span className="error">{errors.password}</span>}
 
@@ -103,7 +102,6 @@ const LoginPage = () => {
                 <button type="submit">Login</button>
                 <div className="mt-2">
                     Don't have an account ? <Link to={"/register"} className="text-decoration-none">Signup</Link>
-
                 </div>
             </form>
         </div>

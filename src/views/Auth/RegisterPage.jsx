@@ -1,8 +1,11 @@
 import React, { useContext, useState } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Link, useNavigate } from "react-router-dom";
+
+import '../../assets/styles/AuthPage.css';
 import { AuthContext } from "../../contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+
 
 const RegisterPage = () => {
     const [name, setName] = useState('');
@@ -116,24 +119,27 @@ const RegisterPage = () => {
                 <div>
                     <label htmlFor="name">Name</label>
                     <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
-                    { errors.name && <p className="error">{errors.name}</p>}
+                    { errors.name && <span className="error">{errors.name}</span>}
                 </div>
                 <div>
                     <label htmlFor="email">Email</label>
                     <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                    { errors.email && <p className="error">{errors.email}</p>}
+                    { errors.email && <span className="error">{errors.email}</span>}
                 </div>
                 <div>
                     <label htmlFor="password">Password</label>
                     <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                    { errors.password && <p className="error">{errors.password}</p>}
+                    { errors.password && <span className="error">{errors.password}</span>}
                 </div>
                 <div>
                     <label htmlFor="confirm_password">Confirm Password</label>
                     <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-                    { errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
+                    { errors.confirmPassword && <span className="error">{errors.confirmPassword}</span>}
                 </div>
-                <button type="submit">Register</button>
+                <button type="submit" className="mt-2">Register</button>
+                <div className="mt-2">
+                    Already have an account? <Link to={"/login"} className="text-decoration-none">Login</Link>
+                </div>
             </form>
 
         </div>

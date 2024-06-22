@@ -1,15 +1,15 @@
 import React, { useContext } from "react";
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
-import LoginPage from '../components/Auth/LoginPage';
-import RegisterPage from '../components/Auth/RegisterPage';
+import LoginPage from "../views/Auth/LoginPage";
+import RegisterPage from '../views/Auth/RegisterPage';
 import Index from "../views/Dashboard/LandingPAge/Index";
 import ProfileIndex from "../views/Dashboard/MyProfile/Index";
 import Create from "../views/Post/Create";
 import PostIndex from "../views/Post/Index";
 
-import ForgetPassword from '../components/Auth/ForgetPassword';
-import ResetPassword from '../components/Auth/ResetPassword';
+import ForgetPassword from '../views/Auth/ForgetPassword';
+import ResetPassword from '../views/Auth/ResetPassword';
 
 const AppRoutes = () => {
     const { auth } = useContext(AuthContext);
