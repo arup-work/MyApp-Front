@@ -3,6 +3,8 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import AuthService from "../../services/AuthService";
+
 const ResetPassword = () => {
     const { token } = useParams();
     const navigate = useNavigate();
@@ -30,15 +32,22 @@ const ResetPassword = () => {
         }
 
         if (password !== confirmPassword) {
-            toast.error('Password & confirm password must be same',{
+            toast.error('Password & confirm password must be same', {
                 position: "top-right",
                 className: 'foo-bar'
             });
-            return 
+            return
         }
 
         setErrors(newErrors);
         return !Object.keys(newErrors).length;
+    }
+
+    // Reset form
+    const resetForm = () => {
+        setPassword('');
+        setConfirmPassword('');
+        setErrors({});
     }
 
     const handleForgetPassword = async (e) => {
@@ -46,56 +55,15 @@ const ResetPassword = () => {
         e.preventDefault();
 
         if (validateForm()) {
-            try {
-                const response = await fetch(`http://127.0.0.1:3000/reset-password/${token}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ newPassword : password })
-                })
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    toast.success(data.message, {
-                        position: "top-right",
-                        className: 'foo-bar'
-                    })
-
-                    // Reset form
-                    setPassword('');
-                    setConfirmPassword('');
-                    setErrors({});
-
-                    navigate('/login', {
-                        state : {
-                            message :  data.message, type : 'success' 
-                        }
-                    });
-                } else {
-                    toast.error(data.message, {
-                        position: "top-right",
-                        className: 'foo-bar'
-                    })
-
-                     // Reset form
-                    setPassword('');
-                    setConfirmPassword('');
-                    setErrors({});
-                    navigate('/login' , {
-                        state : {
-                            message :  data.message, type : 'error' 
-                        }
-                    });
-                    
-                }
-
-            } catch (error) {
-                toast.error(data.message, {
-                    position: "top-right",
-                    className: 'foo-bar'
-                })
+            const response = await AuthService.resetPassword(password, token);
+            // Reset form
+            resetForm();
+            if (response.data) {
+                navigate('/login', {
+                    state: {
+                        message: response.data.message, type: 'success'
+                    }
+                });
             }
         }
     }

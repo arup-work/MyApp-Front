@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import '../../assets/styles/AuthPage.css';
 import { AuthContext } from "../../contexts/AuthContext";
+import AuthService from "../../services/AuthService";
 
 
 const RegisterPage = () => {
@@ -54,61 +55,32 @@ const RegisterPage = () => {
         return !Object.keys(newErrors).length;
     }
 
+    // Reset the form
+    const resetForm = () => {
+        setName('');
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+        setErrors({});
+        setErrors('');
+    }
+
     const handleRegister = async (e) => {
         e.preventDefault();
 
-       if (validateForm()) {
-        console.log('Name: ', name);
-        console.log('Email: ', email);
-        console.log('Password: ', password);
-        console.log('Confirm Password: ', password);
-
-        try {
-            const response = await fetch('http://127.0.0.1:3000/api/v1/auth/register',{
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ name, email, password, confirmPassword }),
-            })
-
-            const data = await response.json();
-            console.log(data);
-
-            if (response.ok) {
-                // toast.success('Registration successful', {
-                //     position: "top-right",
-                //     className: 'foo-bar'
-                // });
-
-                // login(data.token, data.user);
-
+        if (validateForm()) {
+            const response = await AuthService.register(name, email, password, confirmPassword);
+            if (response.data) {
                 // Reset form
-                setName('');
-                setEmail('');
-                setPassword('');
-                setConfirmPassword('');
-                setErrors({});
-                setErrors('');
-
+                resetForm();
                 navigate('/login', {
-                    state : {
-                        message :  data.message, type : 'success' 
+                    state: {
+                        message: response.data.message, type: 'success'
                     }
                 });
-            }else{
-                console.error('Registration failed:', data.message);
-                toast.error(data.message, {
-                    position: "top-right",
-                    className: 'foo-bar'
-                });
             }
-        } catch (error) {
-            console.error('Error during registration:', error);
-            setErrors('An error occurred. Please try again later.');
         }
-       }
-      
+
     }
 
     return (
@@ -119,22 +91,22 @@ const RegisterPage = () => {
                 <div>
                     <label htmlFor="name">Name</label>
                     <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
-                    { errors.name && <span className="error">{errors.name}</span>}
+                    {errors.name && <span className="error">{errors.name}</span>}
                 </div>
                 <div>
                     <label htmlFor="email">Email</label>
                     <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                    { errors.email && <span className="error">{errors.email}</span>}
+                    {errors.email && <span className="error">{errors.email}</span>}
                 </div>
                 <div>
                     <label htmlFor="password">Password</label>
                     <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                    { errors.password && <span className="error">{errors.password}</span>}
+                    {errors.password && <span className="error">{errors.password}</span>}
                 </div>
                 <div>
                     <label htmlFor="confirm_password">Confirm Password</label>
                     <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-                    { errors.confirmPassword && <span className="error">{errors.confirmPassword}</span>}
+                    {errors.confirmPassword && <span className="error">{errors.confirmPassword}</span>}
                 </div>
                 <button type="submit" className="mt-2">Register</button>
                 <div className="mt-2">

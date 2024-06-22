@@ -54,16 +54,13 @@ const LoginPage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         if (validateForm()) {
-            try {
-                const response = await AuthService.login(email, password);
-                if (response.data) {
-                    login(response.token, response.user);
-                }
+            const response = await AuthService.login(email, password);
+            if (response.data) {
+                login(response.data.token, response.data.user);
                 resetForm();
-            } catch (error) {
-                // setErrors('An error occurred. Please try again later.');
+            } else {
+                setPassword('');
             }
-
         }
 
     }
