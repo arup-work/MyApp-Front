@@ -16,6 +16,7 @@ const apiRequest = async(endpoint, method = 'GET', body = null, headers = {}) =>
     try {
         const response = await fetch(`${BASE_URL}/${endpoint}`, config);
         const data =  await response.json();
+
         if (!response.ok) {
             throw new Error(data.message || 'Something went wrong!');
         }
@@ -24,7 +25,6 @@ const apiRequest = async(endpoint, method = 'GET', body = null, headers = {}) =>
             data
         };
     } catch (error) {
-        console.log('API request error', error);
         return {
             ok: false,
             message: error.message

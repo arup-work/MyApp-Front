@@ -56,11 +56,13 @@ const LoginPage = () => {
         e.preventDefault();
         if (validateForm()) {
             try {
-                const { token, user } = await AuthService.login(email, password);
-                login(token, user);
+                const response = await AuthService.login(email, password);
+                if (response.data) {
+                    login(response.token, response.user);
+                }
                 resetForm();
             } catch (error) {
-                setErrors('An error occurred. Please try again later.');
+                // setErrors('An error occurred. Please try again later.');
             }
 
         }
@@ -87,12 +89,12 @@ const LoginPage = () => {
                     <label htmlFor="email">Email: </label>
                     <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} />
 
-                    {errors.email && <p className="error">{errors.email}</p>}
+                    {errors.email && <span className="error">{errors.email}</span>}
                 </div>
                 <div>
                     <label htmlFor="password">Password: </label>
                     <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                    {errors.password && <p className="error">{errors.password}</p>}
+                    {errors.password && <span className="error">{errors.password}</span>}
 
                 </div>
                 <div>

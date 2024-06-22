@@ -4,17 +4,19 @@ import { showSuccessToast, showErrorToast } from "../helpers/utils/toastUtils";
 const AuthService = {
     async login(email, password) {
         try {
-            const { ok, data, message} = await apiRequest('/auth/login', 'POST' , { email, password});
-            if (ok) {
+            const response = await apiRequest('/auth/login', 'POST' , { email, password});
+            if (response.ok) {
                 showSuccessToast('Login successful');
-                return data;
+                return { data: response.data, error: null };
             }else{
-                showErrorToast(message || 'Login failed');
-                throw new Error(message || 'Login failed');
+                const errorMessage = response.message || 'An error occurred. Please try again later.';
+                showErrorToast(errorMessage);
+                return { data: null, error: errorMessage };
             }
         } catch (error) {
-            showErrorToast('An error occurred.Please try again letter');
-            throw error;
+            const errorMessage = error.message || 'An error occurred. Please try again later.';
+            showErrorToast(errorMessage);
+            return { data: null, error: errorMessage };
         }
     }
 }
