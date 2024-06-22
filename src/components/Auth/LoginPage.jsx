@@ -1,9 +1,14 @@
-import React, {useState, useContext, useEffect} from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './LoginPage.css';
-import { AuthContext } from "../../contexts/AuthContext";
 import { Link, useLocation } from "react-router-dom";
+
+import { AuthContext } from "../../contexts/AuthContext";
+import apiRequest from "../../helpers/utils/api";
+import { showSuccessToast, showErrorToast } from "../../helpers/utils/toastUtils";
+import AuthService from "../../services/AuthService";
+
 
 
 const LoginPage = () => {
@@ -24,14 +29,14 @@ const LoginPage = () => {
         const newErrors = {};
         if (!email) {
             newErrors.email = 'Email is required'
-        }else if(!validateEmail(email)) {
+        } else if (!validateEmail(email)) {
             newErrors.email = 'Email is not valid'
         }
 
 
         if (!password) {
             newErrors.password = 'Password is required'
-        } else if(password.length < 6){
+        } else if (password.length < 6) {
             newErrors.password = 'Password must be 6 characters long!'
         }
 
@@ -39,60 +44,35 @@ const LoginPage = () => {
         return !Object.keys(newErrors).length;
     }
 
+    // Reset form
+    const resetForm = () => {
+        setEmail('');
+        setErrors({});
+        setPassword('');
+    }
 
-    const handleLogin = async(e) => {
+
+    const handleLogin = async (e) => {
         e.preventDefault();
-
-       if (validateForm()) {
-        try {
-            const response = await fetch('http://127.0.0.1:3000/api/v1/auth/login',{
-                method : 'POST',
-                headers : {
-                    'Content-Type' : 'application/json'
-                },
-                body: JSON.stringify({ email, password})
-            })
-
-            const data = await response.json();
-            
-            if (response.ok) {
-                toast.success('Login successful',{
-                    position: "top-right",
-                    className: 'foo-bar'
-                });
-                login(data.token, data.user);
-                // Reset form
-                setEmail('');
-                setErrors({});
-                setPassword('');
-            }else{
-                console.log(data.message);
-                toast.error(data.message, {
-                    position: "top-right",
-                    className: 'foo-bar'
-                });
+        if (validateForm()) {
+            try {
+                const { token, user } = await AuthService.login(email, password);
+                login(token, user);
+                resetForm();
+            } catch (error) {
+                setErrors('An error occurred. Please try again later.');
             }
-            
-        } catch (error) {
-            setErrors('An error occurred. Please try again later.');
+
         }
-        
-       }
-      
+
     }
 
     useEffect(() => {
         if (location.state?.message) {
             if (location.state.type === 'success') {
-                toast.success(location.state.message, {
-                  position: 'top-right',
-                  className: 'foo-bar'
-                });
+                showSuccessToast(location.state.message);
             } else if (location.state.type === 'error') {
-                toast.error(location.state.message, {
-                  position: 'top-right',
-                  className: 'foo-bar'
-                });
+                showErrorToast(location.state.message);
             }
         }
     }, [location.state])
@@ -119,6 +99,10 @@ const LoginPage = () => {
                     <Link to={"/forget-password"} className="d-block mt-3 text-decoration-none">Forget password?</Link>
                 </div>
                 <button type="submit">Login</button>
+                <div className="mt-2">
+                    Don't have an account ? <Link to={"/register"} className="text-decoration-none">Signup</Link>
+
+                </div>
             </form>
         </div>
     );
