@@ -7,6 +7,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 
 import PostEditModal from "../../components/Auth/Modal/PostEditModal";
+import AuthService from "../../services/AuthService";
+import PostService from "../../services/PostService";
 
 
 const Index = () => {
@@ -27,26 +29,11 @@ const Index = () => {
         }
     }
 
-    const edit = async(postId) => {
-        try {
-            const response = await fetch(`http://127.0.0.1:3000/api/v1/post/${postId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            })
-
-            const data = await response.json();
-            if (response.ok) {
-                setPostDetails(data.post);
-            }else{
-                toast.error(data.message, {
-                    position: "top-right",
-                    className: 'foo-bar'
-                });
-            }
-        } catch (error) {
-            
+    const edit = async (postId) => {
+        const response = await PostService.show(postId);
+        const data = response.data;
+        if (data) {
+            setPostDetails(data.post);
         }
         setShowEditModal(true);
     }
@@ -71,23 +58,11 @@ const Index = () => {
     }
     // Fetch posts 
     const fetchPosts = async () => {
-        try {
-            const response = await fetch(`http://127.0.0.1:3000/api/v1/post?page=${currentPage}&limit=${postsPerPage}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                setPosts(data.posts.post);
-                setTotalPage(data.posts.totalPage);
-            } else {
-                toast.error(data.message || 'Failed to fetch posts');
-            }
-        } catch (error) {
-            toast.error('An error occurred while fetching posts');
+        const response = await PostService.index(currentPage, postsPerPage);
+        if (response.data) {
+            const data = response.data;
+            setPosts(data.posts.post);
+            setTotalPage(data.posts.totalPage);
         }
     }
 

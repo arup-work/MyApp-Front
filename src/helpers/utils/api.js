@@ -1,21 +1,26 @@
-const BASE_URL = 'http://127.0.0.1:8000/api/v1';
+const apiRequest = async (endpoint, method = 'GET', body = null, headers = {}) => {
+    const BASE_URL = 'http://127.0.0.1:8000/api/v1';
 
-const apiRequest = async(endpoint, method = 'GET', body = null, headers = {}) => {
     const config = {
         method,
         headers: {
-            'Content-Type' : 'application/json',
             ...headers
         }
     }
 
     if (body) {
-        config.body = JSON.stringify(body);
+        if (body instanceof FormData) {
+            // Let the browser set the correct Content-Type for FormData
+            config.body = body;
+        }else{
+            config.headers['Content-Type'] = 'application/json';
+            config.body = JSON.stringify(body); 
+        }
     }
 
     try {
         const response = await fetch(`${BASE_URL}/${endpoint}`, config);
-        const data =  await response.json();
+        const data = await response.json();
 
         if (!response.ok) {
             throw new Error(data.message || 'Something went wrong!');
@@ -30,6 +35,6 @@ const apiRequest = async(endpoint, method = 'GET', body = null, headers = {}) =>
             message: error.message
         }
     }
-} 
+}
 
 export default apiRequest;

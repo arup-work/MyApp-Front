@@ -4,6 +4,7 @@ import { useDropzone } from "react-dropzone";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
+import PostService from "../../services/PostService";
 
 const Create = () => {
     const { auth } = useContext(AuthContext);
@@ -31,7 +32,7 @@ const Create = () => {
 
         if (!img) {
             newErrors.img = "This field is required";
-        } else if (!['image/png','image/jpg','image/jpeg'].includes(img.type)) {
+        } else if (!['image/png', 'image/jpg', 'image/jpeg'].includes(img.type)) {
             newErrors.img = "Only PNG, JPG and JPEG files are allowed";
         }
 
@@ -42,7 +43,7 @@ const Create = () => {
     const onDrop = useCallback(acceptedFiles => {
         if (acceptedFiles.length > 0) {
             const file = acceptedFiles[0];
-            if (!['image/png','image/jpg','image/jpeg'].includes(file.type)) {
+            if (!['image/png', 'image/jpg', 'image/jpeg'].includes(file.type)) {
                 setErrors(prevErrors => ({ ...prevErrors, img: 'Only PNG, JPG and JPEG files are allowed' }));
                 return;
             }
@@ -56,53 +57,49 @@ const Create = () => {
         onDrop
     });
 
-    const handleCreatePost = async(e) => {
+    // Reset the form
+    const resetForm = () => {
+        setTitle('');
+        setDesc('');
+        setImg('');
+        setErrors({});
+        setImgPreview(null);
+    }
+
+    const handleCreatePost = async (e) => {
         e.preventDefault();
         if (validateForm()) {
             const formData = new FormData();
-            formData.append('title',title);
-            formData.append('description',desc);
-            formData.append('file',img);
+            formData.append('title', title);
+            formData.append('description', desc);
+            formData.append('file', img);
+            console.log(formData);
 
             try {
-                const response = await fetch('http://127.0.0.1:3000/api/v1/post',{
-                    method: 'POST',
-                    body: formData
-                });
-
-                const data = await response.json();
-                if (response.ok) {
-                    toast.success(data.message,{
-                        position: "top-right",
-                        className: 'foo-bar'
-                    });
+                const response = await PostService.store(formData);
+                const data = response.data;
+                if (data) {
                     // Reset form
-                    setTitle('');
-                    setDesc('');
-                    setImg('');
-                    setErrors({});
-                    setImgPreview(null);
+                    resetForm();
 
                     navigate('/post', {
-                        state : {
-                            message :  data.message, type : 'success' 
+                        state: {
+                            message: data.message, type: 'success'
                         }
                     });
-                }else{
-                    toast.error(data.message, {
-                        position: "top-right",
-                        className: 'foo-bar'
-                    });
+                } else {
+                    showErrorToast(response.error);
                 }
+
             } catch (error) {
-                setErrors('An error occurred. Please try again later.');
+                showErrorToast('An error occurred. Please try again later.');
             }
         }
     }
 
     return (
         <div className="container">
-             <ToastContainer />
+            <ToastContainer />
             <div className="row justify-content-center mt-5">
                 <div className="col-8">
                     <div className="card">
@@ -126,7 +123,7 @@ const Create = () => {
                                             <input {...getInputProps()} />
                                             {
                                                 imgPreview ?
-                                                imgPreview && <img src={imgPreview} alt="Selected" className="img-thumbnail mt-2" style={{maxHeight: "200px"}} /> :
+                                                    imgPreview && <img src={imgPreview} alt="Selected" className="img-thumbnail mt-2" style={{ maxHeight: "200px" }} /> :
                                                     <p>Click or drag and drop here</p>
                                             }
                                         </div>

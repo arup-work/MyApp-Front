@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useNavigate } from "react-router-dom";
+import PostService from "../../../services/PostService";
 
 const PostEditModal = ({ show, handleClose, postDetails }) => {
     const [postId, setPostId] = useState('');
@@ -15,7 +16,7 @@ const PostEditModal = ({ show, handleClose, postDetails }) => {
     const onDrop = useCallback(acceptedFiles => {
         if (acceptedFiles.length > 0) {
             const file = acceptedFiles[0];
-            if (!['image/png','image/jpg','image/jpeg'].includes(file.type)) {
+            if (!['image/png', 'image/jpg', 'image/jpeg'].includes(file.type)) {
                 setErrors(prevErrors => ({ ...prevErrors, image: 'Only PNG,  and JPEG files are allowed' }));
                 return;
             }
@@ -43,7 +44,7 @@ const PostEditModal = ({ show, handleClose, postDetails }) => {
             newErrors.description = "The title must contain 12 characters";
         }
 
-        if(image && !['image/png','image/jpg','image/jpeg'].includes(image.type)) {
+        if (image && !['image/png', 'image/jpg', 'image/jpeg'].includes(image.type)) {
             newErrors.image = "Only PNG, JPG and JPEG files are allowed";
         }
 
@@ -51,33 +52,37 @@ const PostEditModal = ({ show, handleClose, postDetails }) => {
         return Object.keys(newErrors).length === 0;
     }
 
-    const handleUpdatePost = async(e) => {
+    // Reset form
+    const resetForm = () => {
+        setPostId('');
+        setTitle('');
+        setDescription('');
+        setImage('');
+        setErrors({});
+        setImgPreview(null);
+    }
+
+    const handleUpdatePost = async (e) => {
         e.preventDefault();
         if (validateForm()) {
+            console.log("scnndmsc");
             const formData = new FormData();
-            formData.append('title',title);
-            formData.append('description',description);
-            formData.append('file',image);
+            formData.append('title', title);
+            formData.append('description', description);
+            formData.append('file', image);
 
             try {
-                const response = await fetch(`http://127.0.0.1:3000/api/v1/post/${postId}`,{
-                    method: 'PUT',
-                    body: formData
-                });
-
-                const data = await response.json();
-                if (response.ok) {
-                    console.log("hii")
+                const response = await PostService.update(postId, formData);
+                const data = response.data;
+                if (data) {
                     navigate('/post', {
-                        state : {
-                            message :  data.message, type : 'success' 
+                        state: {
+                            message: data.message, type: 'success'
                         }
                     });
                     handleClose();
-                }else{
-                    
+                    resetForm();
                 }
-
             } catch (error) {
                 setErrors('An error occurred. Please try again later.');
             }
@@ -106,13 +111,13 @@ const PostEditModal = ({ show, handleClose, postDetails }) => {
                             <form>
                                 <div>
                                     <label htmlFor="title">Title</label>
-                                    <input type="text" value={title} onChange={(e) => e.target.value} className="form-control" />
+                                    <input type="text" name="title" value={title} onChange={(e) => setTitle(e.target.value)} className="form-control" />
                                     {errors.title && <p className="text-danger">{errors.title}</p>}
                                 </div>
                                 <div className="mt-2">
                                     <label htmlFor="description">Description</label>
-                                    <textarea name="description" id="description" onChange={(e) => e.target.value} className="form-control"  value={description}/>
-                                    {errors.desc && <p className="text-danger">{errors.desc}</p>}
+                                    <textarea name="description" id="description" onChange={(e) => setDescription(e.target.value)} className="form-control" value={description} />
+                                    {errors.description && <p className="text-danger">{errors.description}</p>}
 
                                 </div>
                                 <div className="mt-2">
@@ -122,7 +127,7 @@ const PostEditModal = ({ show, handleClose, postDetails }) => {
                                             <input {...getInputProps()} />
                                             {
                                                 imgPreview ?
-                                                imgPreview && <img src={imgPreview} alt="Selected" className="img-thumbnail mt-2" style={{maxHeight: "200px"}} /> :
+                                                    imgPreview && <img src={imgPreview} alt="Selected" className="img-thumbnail mt-2" style={{ maxHeight: "200px" }} /> :
                                                     <p>Click or drag and drop here</p>
                                             }
                                         </div>

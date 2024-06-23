@@ -7,7 +7,7 @@ const Index = () => {
 
     return (
         <div className="container d-flex justify-content-center mt-2">
-            <h1>Welcome, <span className="text-primary">{auth.user.name}</span></h1>
+            <h1>Welcome back, <span className="text-primary">{auth.user.name}</span></h1>
         </div>
     )
 }

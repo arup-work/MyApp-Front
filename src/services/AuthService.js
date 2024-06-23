@@ -1,6 +1,5 @@
 import apiRequest from "../helpers/utils/api";
 import { showSuccessToast, showErrorToast } from "../helpers/utils/toastUtils";
-import ResetPassword from "../views/Auth/ResetPassword";
 
 const AuthService = {
     async login(email, password) {
@@ -31,7 +30,7 @@ const AuthService = {
         const response = await apiRequest('/auth/forget-password','POST', {email});
         if (response.ok) {
             const data = response.data;
-            showSuccessToast(response.message);
+            showSuccessToast(data.message);
             return { data, error: null};
         }else{
             const errorMessage = response.message || 'An error occurred. Please try again later.';
@@ -41,11 +40,10 @@ const AuthService = {
     },
 
     async resetPassword(password, token) {
-        console.log("sdgfxchbn",token);
         const response = await apiRequest(`/auth/reset-password/${token}`, 'PUT', { newPassword : password});
         if (response.ok) {
             const data = response.data;
-            showSuccessToast(response.message);
+            showSuccessToast(data.message);
             return { data, error: null};
         }else{
             const errorMessage = response.message || 'An error occurred. Please try again later.';
