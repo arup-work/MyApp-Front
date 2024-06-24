@@ -6,11 +6,10 @@ import Pagination from "../../components/Pagination";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 
-import PostEditModal from "../../components/Auth/Modal/PostEditModal";
+import PostEditModal from "../../components/Modal/Post/PostEditModal";
 import AuthService from "../../services/AuthService";
 import PostService from "../../services/PostService";
 import { showConfirmationModal, showSuccessModal } from "../../helpers/utils/sweetAlertUtils";
-import { showSuccessToast } from "../../helpers/utils/toastUtils";
 
 
 const Index = () => {
