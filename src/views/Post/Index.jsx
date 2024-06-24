@@ -9,6 +9,8 @@ import { faPlus, faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import PostEditModal from "../../components/Auth/Modal/PostEditModal";
 import AuthService from "../../services/AuthService";
 import PostService from "../../services/PostService";
+import { showConfirmationModal, showSuccessModal } from "../../helpers/utils/sweetAlertUtils";
+import { showSuccessToast } from "../../helpers/utils/toastUtils";
 
 
 const Index = () => {
@@ -36,6 +38,25 @@ const Index = () => {
             setPostDetails(data.post);
         }
         setShowEditModal(true);
+    }
+
+    const deletePost = async(postId) => {
+       const result = await showConfirmationModal('Delete Post','Are you sure you want to delete this post?');
+       if (result.isConfirmed) {
+            try {
+                const response = await PostService.deletePost(postId);
+                if (response.data) {
+                    navigate('/post',{
+                        state: {
+                            message : 'Post deleted successfully',
+                            type: 'success'
+                        }
+                    })
+                }
+            } catch (error) {
+                
+            }
+       }
     }
 
     const stateMessage = () => {
@@ -111,7 +132,7 @@ const Index = () => {
                                     <button className="btn btn-primary me-2" onClick={() => edit(post._id)}>
                                         <FontAwesomeIcon icon={faEdit} />
                                     </button>
-                                    <button className="btn btn-danger ml-2">
+                                    <button className="btn btn-danger ml-2" onClick={() => deletePost(post._id)}>
                                         <FontAwesomeIcon icon={faTrashAlt} />
                                     </button>
                                 </td>

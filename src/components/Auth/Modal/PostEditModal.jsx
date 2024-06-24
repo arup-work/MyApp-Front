@@ -65,7 +65,6 @@ const PostEditModal = ({ show, handleClose, postDetails }) => {
     const handleUpdatePost = async (e) => {
         e.preventDefault();
         if (validateForm()) {
-            console.log("scnndmsc");
             const formData = new FormData();
             formData.append('title', title);
             formData.append('description', description);

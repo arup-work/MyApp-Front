@@ -73,7 +73,6 @@ const Create = () => {
             formData.append('title', title);
             formData.append('description', desc);
             formData.append('file', img);
-            console.log(formData);
 
             try {
                 const response = await PostService.store(formData);
