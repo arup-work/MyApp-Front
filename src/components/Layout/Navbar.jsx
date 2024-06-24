@@ -1,7 +1,7 @@
 import React, { useContext, useState }  from "react";
 import { Link } from "react-router-dom";
 import { Navbar, Nav, NavDropdown, Container } from 'react-bootstrap';
-import LogoutModal from "../Auth/Modal/LogoutModal";
+import LogoutModal from "../Modal/Auth/LogoutModal";
 import { AuthContext } from "../../contexts/AuthContext";
 
 
