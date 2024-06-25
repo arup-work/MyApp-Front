@@ -3,7 +3,7 @@ import { useDropzone } from "react-dropzone";
 import { useNavigate } from "react-router-dom";
 import PostService from "../../../services/PostService";
 
-const PostEditModal = ({ show, handleClose, postDetails }) => {
+const PostEditModal = ({ show, handleClose, postDetails, viewMode }) => {
     const [postId, setPostId] = useState('');
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -16,6 +16,7 @@ const PostEditModal = ({ show, handleClose, postDetails }) => {
     const onDrop = useCallback(acceptedFiles => {
         if (acceptedFiles.length > 0) {
             const file = acceptedFiles[0];
+            console.log(file);
             if (!['image/png', 'image/jpg', 'image/jpeg'].includes(file.type)) {
                 setErrors(prevErrors => ({ ...prevErrors, image: 'Only PNG,  and JPEG files are allowed' }));
                 return;
@@ -27,7 +28,10 @@ const PostEditModal = ({ show, handleClose, postDetails }) => {
     }, []);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        onDrop
+        onDrop,
+        disabled: viewMode,
+        noClick: viewMode,
+        noKeyboard: viewMode
     });
 
     const validateForm = () => {
@@ -89,6 +93,7 @@ const PostEditModal = ({ show, handleClose, postDetails }) => {
     }
 
     useEffect(() => {
+        console.log("called=====>",viewMode);
         if (postDetails) {
             setTitle(postDetails.title);
             setDescription(postDetails.description);
@@ -103,27 +108,27 @@ const PostEditModal = ({ show, handleClose, postDetails }) => {
                 <div className="modal-dialog">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title" id="staticBackdropLabel">Edit Post</h5>
+                            <h5 className="modal-title" id="staticBackdropLabel">{viewMode ?'View' :'Edit'} Post</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={handleClose}></button>
                         </div>
                         <div className="modal-body">
                             <form>
                                 <div>
                                     <label htmlFor="title">Title</label>
-                                    <input type="text" name="title" value={title} onChange={(e) => setTitle(e.target.value)} className="form-control" />
+                                    <input type="text" name="title" value={title} onChange={(e) => setTitle(e.target.value)} className="form-control" readOnly={viewMode} />
                                     {errors.title && <p className="text-danger">{errors.title}</p>}
                                 </div>
                                 <div className="mt-2">
                                     <label htmlFor="description">Description</label>
-                                    <textarea name="description" id="description" onChange={(e) => setDescription(e.target.value)} className="form-control" value={description} />
+                                    <textarea name="description" id="description" onChange={(e) => setDescription(e.target.value)} className="form-control" value={description} readOnly={viewMode} />
                                     {errors.description && <p className="text-danger">{errors.description}</p>}
 
                                 </div>
                                 <div className="mt-2">
                                     <label htmlFor="image" className="form-label">Image</label>
                                     <div className="card text-center">
-                                        <div {...getRootProps({ className: 'dropzone' })} className="form-control p-3">
-                                            <input {...getInputProps()} />
+                                        <div {...getRootProps({ className: 'dropzone' })} className="form-control p-3" readOnly={viewMode}>
+                                            <input {...getInputProps()}/>
                                             {
                                                 imgPreview ?
                                                     imgPreview && <img src={imgPreview} alt="Selected" className="img-thumbnail mt-2" style={{ maxHeight: "200px" }} /> :
@@ -137,7 +142,7 @@ const PostEditModal = ({ show, handleClose, postDetails }) => {
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={handleClose}>Close</button>
-                            <button type="button" className="btn btn-primary" onClick={handleUpdatePost}>Update</button>
+                            {!viewMode && <button type="button" className="btn btn-primary" onClick={handleUpdatePost}>Update</button>}
                         </div>
                     </div>
                 </div>

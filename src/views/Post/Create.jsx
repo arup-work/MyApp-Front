@@ -5,6 +5,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
 import PostService from "../../services/PostService";
+import { showErrorToast } from "../../helpers/utils/toastUtils";
 
 const Create = () => {
     const { auth } = useContext(AuthContext);
@@ -75,7 +76,7 @@ const Create = () => {
             formData.append('file', img);
 
             try {
-                const response = await PostService.store(formData);
+                const response = await PostService.store(auth,formData);
                 const data = response.data;
                 if (data) {
                     // Reset form
@@ -86,9 +87,10 @@ const Create = () => {
                             message: data.message, type: 'success'
                         }
                     });
-                } else {
-                    showErrorToast(response.error);
-                }
+                } 
+                // else {
+                //     showErrorToast(response.error);
+                // }
 
             } catch (error) {
                 showErrorToast('An error occurred. Please try again later.');

@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Pagination from "../../components/Pagination";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faEdit, faTrashAlt, faEye } from '@fortawesome/free-solid-svg-icons';
 
 import PostEditModal from "../../components/Modal/Post/PostEditModal";
 import AuthService from "../../services/AuthService";
 import PostService from "../../services/PostService";
 import { showConfirmationModal, showSuccessModal } from "../../helpers/utils/sweetAlertUtils";
+import { AuthContext } from "../../contexts/AuthContext";
 
 
 const Index = () => {
@@ -22,6 +23,9 @@ const Index = () => {
 
     const [showEditModal, setShowEditModal] = useState(false);
     const [postDetails, setPostDetails] = useState([]);
+    const [viewMode, setViewMode] = useState(false);
+
+    const { auth } = useContext(AuthContext);
 
 
     const handlePageChange = (page) => {
@@ -30,32 +34,33 @@ const Index = () => {
         }
     }
 
-    const edit = async (postId) => {
+    const edit = async (postId, isViewModeEnable = false) => {
         const response = await PostService.show(postId);
         const data = response.data;
         if (data) {
             setPostDetails(data.post);
         }
+        setViewMode(isViewModeEnable);
         setShowEditModal(true);
     }
 
-    const deletePost = async(postId) => {
-       const result = await showConfirmationModal('Delete Post','Are you sure you want to delete this post?');
-       if (result.isConfirmed) {
+    const deletePost = async (postId) => {
+        const result = await showConfirmationModal('Delete Post', 'Are you sure you want to delete this post?');
+        if (result.isConfirmed) {
             try {
                 const response = await PostService.deletePost(postId);
                 if (response.data) {
-                    navigate('/post',{
+                    navigate('/post', {
                         state: {
-                            message : 'Post deleted successfully',
+                            message: 'Post deleted successfully',
                             type: 'success'
                         }
                     })
                 }
             } catch (error) {
-                
+
             }
-       }
+        }
     }
 
     const stateMessage = () => {
@@ -78,7 +83,7 @@ const Index = () => {
     }
     // Fetch posts 
     const fetchPosts = async () => {
-        const response = await PostService.index(currentPage, postsPerPage);
+        const response = await PostService.index(auth, currentPage, postsPerPage);
         if (response.data) {
             const data = response.data;
             setPosts(data.posts.post);
@@ -128,11 +133,18 @@ const Index = () => {
                                 <td>{post.description}</td>
                                 <td><img src={post.image} alt="post_image" className="img-thumbnail" width={100} /></td>
                                 <td>
-                                    <button className="btn btn-primary me-2" onClick={() => edit(post._id)}>
-                                        <FontAwesomeIcon icon={faEdit} />
-                                    </button>
-                                    <button className="btn btn-danger ml-2" onClick={() => deletePost(post._id)}>
-                                        <FontAwesomeIcon icon={faTrashAlt} />
+                                    {post.userId === auth.user.id ? (
+                                        <>
+                                            <button className="btn btn-primary me-2" onClick={() => edit(post._id)}>
+                                                <FontAwesomeIcon icon={faEdit} />
+                                            </button>
+                                            <button className="btn btn-danger ml-2" onClick={() => deletePost(post._id)}>
+                                                <FontAwesomeIcon icon={faTrashAlt} />
+                                            </button>
+                                        </>
+                                    ) : null}
+                                    <button className="btn btn-primary mx-2" onClick={() => edit(post._id, true)}>
+                                        <FontAwesomeIcon icon={faEye} />
                                     </button>
                                 </td>
                             </tr>
@@ -145,8 +157,7 @@ const Index = () => {
                     onPageChange={handlePageChange}
                 />
             </div>
-            {/* Edit modal */}
-            <PostEditModal show={showEditModal} handleClose={handleClose} postDetails={postDetails} />
+            {showEditModal && <PostEditModal show={showEditModal} handleClose={handleClose} postDetails={postDetails} viewMode={viewMode} />}
         </div>
     )
 }
