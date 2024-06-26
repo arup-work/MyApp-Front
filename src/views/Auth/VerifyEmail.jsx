@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import AuthService from "../../services/AuthService";
 import { showErrorToast } from "../../helpers/utils/toastUtils";
 import { ToastContainer } from "react-toastify";
@@ -9,16 +9,29 @@ import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 const VerifyEmail = () => {
     const { token } = useParams();
     const [message, setMessage] = useState('');
+    const [name, setName] = useState('');
+    const navigate = useNavigate();
 
     useEffect(() => {
         const verifyEmail = async () => {
             try {
                 const response = await AuthService.verifyEmail(token);
                 if (response.data) {
-                    setMessage("Your email has been verified successfully!");
+                    const data = response.data;
+                    setMessage(data.message);
+                    setName(data.user.name);
+                } else {
+                    console.log("called");
+                    setMessage('');
+                    setName('');
+                    navigate('/login', {
+                        state: {
+                            message : response.error,
+                            type: 'error'
+                        }
+                    })
                 }
             } catch (error) {
-                console.log("hrtr");
                 setMessage("Email verification failed. Please try again.");
             }
         };
@@ -32,19 +45,14 @@ const VerifyEmail = () => {
                 <div className="col-md-8">
                     <div className="card shadow-lg">
                         <div className="card-body text-center">
-                            <h2 className="card-title mb-4">Congratulations Arup Panda!</h2>
-                            {message === "Your email has been verified successfully!" ? (
+                            <h2 className="card-title mb-4">Congratulations {name}!</h2>
+                            {message != '' && (
                                 <>
-                                    <i className="bi bi-check-circle-fill text-success display-3 mb-3"></i>
-                                    <p className="text-success">{message}</p>
-                                </>
-                            ) : (
-                                <>
-                                    <p className="text-success"><span><FontAwesomeIcon icon={faCircleCheck} className="mx-2"/></span>Your email has been verified successfully! 
-                                    <br /> <span className="ms-4">Now you can login with your credential.</span></p>
+                                    <p className="text-success"><span><FontAwesomeIcon icon={faCircleCheck} className="mx-2" /></span>Your email has been verified successfully!
+                                        <br /> <span className="ms-4">Now you can login with your credential.</span></p>
                                 </>
                             )}
-                            
+
                             <Link to="/login" className="text-decoration-none btn btn-primary btn-lg">Back to login</Link>
                         </div>
                     </div>
