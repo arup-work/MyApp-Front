@@ -25,6 +25,17 @@ const AuthService = {
             return { data: null, error: errorMessage };
         }
     },
+    async verifyEmail(token) {
+        const response = await apiRequest(`/auth/verify-email/${token}`);
+        if (response.ok) {
+            showSuccessToast(response.message);
+            return { data: response.data, error: null, message: response.message };
+        } else {
+            const errorMessage = response.message || 'An error occurred. Please try again later.';
+            showErrorToast(errorMessage);
+            return { data: null, error: errorMessage };
+        }
+    },
 
     async forgetPassword(email){
         const response = await apiRequest('/auth/forget-password','POST', {email});

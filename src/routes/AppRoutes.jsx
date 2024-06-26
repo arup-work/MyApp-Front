@@ -10,6 +10,7 @@ import PostIndex from "../views/Post/Index";
 
 import ForgetPassword from '../views/Auth/ForgetPassword';
 import ResetPassword from '../views/Auth/ResetPassword';
+import VerifyEmail from "../views/Auth/VerifyEmail";
 
 const AppRoutes = () => {
     const { auth } = useContext(AuthContext);
@@ -23,6 +24,10 @@ const AppRoutes = () => {
             <Route
                 path='/register'
                 element={!auth.token ? <RegisterPage /> : <Navigate to="/" />}
+            />
+            <Route
+                path='/verify-email/:token'
+                element={!auth.token ? <VerifyEmail /> : <Navigate to="/" />}
             />
             <Route
                 path='/profile'
