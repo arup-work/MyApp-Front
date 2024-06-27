@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import AuthService from "../../../services/AuthService";
 
 
 const Index = () => {
@@ -14,17 +15,17 @@ const Index = () => {
     // Validate the form
     const validateForm = () => {
         const newErrors = {};
-        if (!currentPassword) {
+        if (!currentPassword.trim()) {
             newErrors.currentPassword = 'This field is required';
         }
 
-        if (!password) {
+        if (!password.trim()) {
             newErrors.password = 'This field is required';
         }else if(password.length < 6  ){
             newErrors.password = 'Password must be 6 character long'
         }
 
-        if (!confirmPassword) {
+        if (!confirmPassword.trim()) {
             newErrors.confirmPassword = 'This field is required';
         }else if(confirmPassword.length < 6  ){
             newErrors.confirmPassword = 'Confirm Password must be 6 character long'
@@ -36,63 +37,35 @@ const Index = () => {
                 className: 'foo-bar'
             })
             // Reset the form
-            setPassword('');
-            setConfirmPassword('');
-            setCurrentPassword('');
-            setErrors({});
+            resetForm();
             return;
         }
         // Reset the form
-        setPassword('');
-        setConfirmPassword('');
-        setCurrentPassword('');
-        setErrors({});
+       resetForm();
 
 
         setErrors(newErrors);
         return !Object.keys(newErrors).length;
     }
+
+    // Reset form
+    const resetForm = () => {
+         setPassword('');
+         setConfirmPassword('');
+         setCurrentPassword('');
+         setErrors({});
+    }
+    
     const handleChangePassword = async(e) => {
         e.preventDefault();
-
         if (validateForm()) {
            try {
-             const response = await fetch('http://127.0.0.1:3000/change-password',{
-                method: 'POST',
-                headers: {
-                    'Content-Type' : 'application/json',
-                    'Authorization' : `Bearer ${auth.token}`
-                },
-                body: JSON.stringify({
-                    currentPassword,
-                    newPassword : password
-                })
-             });
-
-             const data = await response.json();
-             if (response.ok) {
-                toast.success(data.message, {
-                    position: "top-right",
-                    className: 'foo-bar'
-                })
-
-                // Reset the form
-                setPassword('');
-                setConfirmPassword('');
-                setCurrentPassword('');
-                setErrors({});
-             }else{
-                toast.error(data.message, {
-                    position: "top-right",
-                    className: 'foo-bar'
-                })
+             const response = await  AuthService.changePassword(auth, { currentPassword, newPassword : password});
+             const data = response.data;
+             if (data) {
+               resetForm();
              }
-
            } catch (error) {
-                toast.error('An error occurred. Please try again later.', {
-                    position: "top-right",
-                    className: 'foo-bar'
-                })
                 setErrors('An error occurred. Please try again later.');
            }
         }

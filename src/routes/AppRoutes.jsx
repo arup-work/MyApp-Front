@@ -7,6 +7,7 @@ import Index from "../views/Dashboard/LandingPAge/Index";
 import ProfileIndex from "../views/Dashboard/MyProfile/Index";
 import Create from "../views/Post/Create";
 import PostIndex from "../views/Post/Index";
+import CommentIndex from "../views/Post/Comment/Index";
 
 import ForgetPassword from '../views/Auth/ForgetPassword';
 import ResetPassword from '../views/Auth/ResetPassword';
@@ -56,6 +57,10 @@ const AppRoutes = () => {
             <Route 
                 path="/post"
                 element={auth.token ? <PostIndex /> : <Navigate to="/login" />}
+            />
+            <Route 
+                path="/post/:postId"
+                element={auth.token ? <CommentIndex /> : <Navigate to="/login" />}
             />
         </Routes>
     )

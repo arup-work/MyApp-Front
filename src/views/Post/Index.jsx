@@ -129,7 +129,9 @@ const Index = () => {
                         {posts.map((post, index) => (
                             <tr key={post._id}>
                                 <td>{index + 1}</td>
-                                <td>{post.title}</td>
+                                <td>
+                                    <Link to={`/post/${post._id}`} className="text-decoration-none">{post.title}</Link>
+                                </td>
                                 <td>{post.description}</td>
                                 <td><img src={post.image} alt="post_image" className="img-thumbnail" width={100} /></td>
                                 <td>

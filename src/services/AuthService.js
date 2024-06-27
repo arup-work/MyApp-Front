@@ -61,6 +61,20 @@ const AuthService = {
             showErrorToast(errorMessage);
             return { data: null, error: errorMessage };
         }
+    },
+
+    async changePassword(auth, data){
+        const bearerToken = { 'Authorization': `Bearer ${auth.token}` };
+        const response = await apiRequest('/auth/change-password','POST',data, bearerToken);
+        if (response.ok) {
+            const data = response.data;
+            showSuccessToast(data.message);
+            return { data, error: null};
+        }else{
+            const errorMessage = response.message || 'An error occurred. Please try again later.';
+            showErrorToast(errorMessage);
+            return { data: null, error: errorMessage };
+        }
     }
 }
 
