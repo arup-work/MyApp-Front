@@ -94,7 +94,7 @@ const Index = () => {
     useEffect(() => {
         stateMessage();
         fetchPosts();
-    }, [location.state, location.pathname, navigate, currentPage, postsPerPage]);
+    }, [location.state, location.pathname, auth, navigate, currentPage, postsPerPage]);
 
     const handleClose = () => {
         setShowEditModal(false);
