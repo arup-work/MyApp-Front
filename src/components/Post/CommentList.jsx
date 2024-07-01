@@ -19,7 +19,7 @@ const CommentList = ({ comments }) => {
                             <small className="text-primary">{comment.userName}</small>
                         </div>
                     </div>
-                    { comments.length -1  !== index  && <hr />}
+                    { comments.length  !== index + 1 && <hr />}
                 </div>
             ))}
         </div>
