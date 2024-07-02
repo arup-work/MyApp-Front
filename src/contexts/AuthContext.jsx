@@ -5,6 +5,7 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ( { children }) => {
     const [auth, setAuth] = useState({ token : null, user: null});
+    const [loading, setLoading] = useState(true); //Add a loading state 
 
     // Function to login
     const login = (token, user) => { 
@@ -27,9 +28,13 @@ export const AuthProvider = ( { children }) => {
         if (token && user) {
             setAuth({ token, user });
         }
+        setLoading(false); // Set loading to false once the check is complete
     }, []) 
 
 
+    if (loading) {
+        return <div>Loading...</div>; // Render a loading indicator or placeholder
+    }
 
     return(
         <AuthContext.Provider value={{ auth, login, logout}}>

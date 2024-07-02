@@ -5,12 +5,17 @@ import { AuthContext } from "../../contexts/AuthContext";
 import '../../assets/styles/PostPage.css';
 import DateFormatter from "../../components/DateFormatter";
 import CommentList from "../../components/Post/CommentList";
+import { ToastContainer } from "react-toastify";
+import CommentService from "../../services/CommentService";
 
 const Details = () => {
     const { postId } = useParams();
     const [post, setPost] = useState({});
     const [comments, setComments] = useState([]);
     const [viewCount, setViewCount] = useState(0);
+    const [comment, setComment] = useState('');
+    const [errors, setErrors] = useState({});
+
     const { auth } = useContext(AuthContext);
 
     const fetchPostWithComments = async () => {
@@ -26,16 +31,42 @@ const Details = () => {
         setViewCount(data);
     }
 
+    // Validate the form
+    const validateForm = () => {
+        const newErrors = {};
+        if (!comment) {
+            newErrors.comment = 'This field is required';
+        }else if(comment.length < 15) {
+            newErrors.comment = 'Comment must be 15 character long!'
+        }else if(comment.length > 255){
+            newErrors.comment = 'Maximum character limit is 255!'
+        }
+
+        setErrors(newErrors);
+        return !Object.keys(newErrors).length;
+    }
+    const handleAddComment = async (e) => {
+        e.preventDefault();
+        if (validateForm()) {
+            const response = await CommentService.store(auth, postId, {comment});
+            if (response.data) {
+                setComment('');
+            }
+        }
+    }
+
     useEffect(() => {
         fetchPostWithComments();
         incrementViewCount();
-    }, [postId])
+    }, [postId, comment])
 
     useEffect(() => {
-    }, [comments]);
+
+    }, [comments])
 
     return (
         <div className="container">
+            <ToastContainer />
             <div className="row justify-content-center mt-5">
                 <div className="col-8">
                     <div className="card post">
@@ -63,6 +94,18 @@ const Details = () => {
                                 </div>
                                 <div className="post-description mb-2">
                                     {post.description}
+                                </div>
+                                <div className="comments-section mt-2">
+                                    <h4 className="comments-count mb-4">Your Comments</h4>
+                                    <form onSubmit={handleAddComment}>
+                                        <div>
+                                            <textarea name="comment" id="comment" cols={5} className="form-control" value={comment} onChange={(e) => setComment(e.target.value)}></textarea>
+                                            { errors.comment && <span className="text-danger">{errors.comment}</span>}
+                                        </div>
+                                        <div className="float-end">
+                                            <button type="submit" className="btn btn-primary mt-2">Add comment</button>
+                                        </div>
+                                    </form>
                                 </div>
                                 <div className="comments-section mt-2">
                                     <h4 className="comments-count mb-4">{comments.length} Comments</h4>
