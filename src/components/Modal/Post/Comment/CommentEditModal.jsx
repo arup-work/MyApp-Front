@@ -3,7 +3,10 @@ import { useDropzone } from "react-dropzone";
 import { useNavigate } from "react-router-dom";
 import PostService from "../../../../services/PostService";
 
-const CommentEditModal = ({ show, handleClose, postDetails }) => {
+const CommentEditModal = ({ show, handleClose, comment }) => {
+    useEffect(() => {
+        console.log(comment);
+    },[]);
     return (
         <div>
             <div className={`modal fade ${show ? 'show' : ''}`} tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style={{ display: show ? 'block' : 'none' }}>
@@ -34,7 +37,7 @@ const CommentEditModal = ({ show, handleClose, postDetails }) => {
                     </div>
                 </div>
             </div>
-            {show && <div className="fade show" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}></div>}
+            {show && <div className="modal-backdrop fade show"></div>}
         </div>
     )
 }

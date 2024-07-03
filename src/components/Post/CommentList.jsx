@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faTrashAlt, faEye } from '@fortawesome/free-solid-svg-icons';
 import DateFormatter from "../DateFormatter";
 import CommentEditModal from "../Modal/Post/Comment/CommentEditModal";
+import CommentService from "../../services/CommentService";
+import { AuthContext } from "../../contexts/AuthContext";
 
 
 
@@ -10,14 +12,26 @@ import CommentEditModal from "../Modal/Post/Comment/CommentEditModal";
 const CommentList = ({ comments }) => {
     const [comment, setComment] = useState('');
     const [showEditModal, setShowEditModal] = useState(false); 
+    const [commentDetails, setCommentDetails] = useState([]);
 
-    const edit = () => {
+    const { auth } = useContext(AuthContext);
+
+    const edit = async (commentId) => {
+        const response = await CommentService.fetchComment(auth, commentId);
+        const comment =response.data.comment;
+        if (comment) {
+            setCommentDetails(comment);
+        }
         setShowEditModal(true);
     }
 
     const handleClose = () => {
         setShowEditModal(false);
     }
+
+    useEffect(() => {
+
+    },[]);
     return (
         <div>
             {comments.map((comment, index) => (
@@ -41,7 +55,7 @@ const CommentList = ({ comments }) => {
                     </div>
                     { comments.length  !== index + 1 && <hr />}
 
-                    { showEditModal && <CommentEditModal show={showEditModal} handleClose={handleClose} comment={comment}/> }
+                    { showEditModal && <CommentEditModal show={showEditModal} handleClose={handleClose} comment={commentDetails}/> }
                 </div>
                 
             ))}
