@@ -147,7 +147,7 @@ const PostEditModal = ({ show, handleClose, postDetails, viewMode }) => {
                     </div>
                 </div>
             </div>
-            {show && <div className="modal-backdrop fade show"></div>}
+            {show && <div className="modal-backdrop fade show" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}></div>}
         </div>
     )
 }
