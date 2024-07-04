@@ -93,7 +93,6 @@ const PostEditModal = ({ show, handleClose, postDetails, viewMode }) => {
     }
 
     useEffect(() => {
-        console.log("called=====>",viewMode);
         if (postDetails) {
             setTitle(postDetails.title);
             setDescription(postDetails.description);

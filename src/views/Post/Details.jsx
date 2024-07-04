@@ -1,14 +1,19 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import PostService from "../../services/PostService";
 import { AuthContext } from "../../contexts/AuthContext";
 import '../../assets/styles/PostPage.css';
 import DateFormatter from "../../components/DateFormatter";
 import CommentList from "../../components/Post/CommentList";
-import { ToastContainer } from "react-toastify";
 import CommentService from "../../services/CommentService";
 
 const Details = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
+
     const { postId } = useParams();
     const [post, setPost] = useState({});
     const [comments, setComments] = useState([]);
@@ -56,6 +61,7 @@ const Details = () => {
     }
 
     const stateMessage = () => {
+        console.log("hii");
         if (location.state?.message) {
             if (location.state.type === 'success') {
                 toast.success(location.state.message, {
@@ -78,7 +84,7 @@ const Details = () => {
         fetchPostWithComments();
         incrementViewCount();
         stateMessage();
-    }, [location.state, postId, comment])
+    }, [location.state, location.pathname, navigate, postId, comment])
 
     useEffect(() => {
 

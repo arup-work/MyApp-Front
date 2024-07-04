@@ -6,9 +6,6 @@ import CommentEditModal from "../Modal/Post/Comment/CommentEditModal";
 import CommentService from "../../services/CommentService";
 import { AuthContext } from "../../contexts/AuthContext";
 
-
-
-
 const CommentList = ({ comments }) => {
     const [comment, setComment] = useState('');
     const [showEditModal, setShowEditModal] = useState(false);

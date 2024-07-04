@@ -46,7 +46,7 @@ export default class CommentService {
     static async updateComment(auth, comment, commentId){
         try {
             const bearerToken = { 'Authorization': `Bearer ${auth.token}` };
-            const response = await apiRequest(`comment/${postId}`,'POST',{comment}, bearerToken);
+            const response = await apiRequest(`comment/${commentId}`,'PUT',{comment}, bearerToken);
             if (response.ok) {
                 const data = response.data;
                 showSuccessToast(response.message);

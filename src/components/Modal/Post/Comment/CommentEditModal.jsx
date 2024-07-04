@@ -26,23 +26,23 @@ const CommentEditModal = ({ show, handleClose, commentDetails }) => {
     }
 
     // Handle the form
-    const handleUpdateComment = (e) => {
+    const handleUpdateComment = async (e) => {
         e.preventDefault();
-
+        const postId = commentDetails.postId;
         if (validateForm()) {
-            console.log(`/post/${commentDetails.postId}`);
+            console.log(`/post/${postId}`);
             try {
-                const response = CommentService.updateComment(auth, {comment}, commentDetails._id );
+                const response = await CommentService.updateComment(auth, comment, commentDetails._id);
                 const data = response.data;
                 if (data) {
-                    navigate(`/post/${commentDetails.postId}`, {
+                    navigate(`/post/${postId}`, {
                         state: {
                             message: data.message, type: 'success'
                         }
                     });
                     handleClose();
                     setComment('');
-                } 
+                }
             } catch (error) {
                 setErrors('An error occurred. Please try again later.');
             }
@@ -50,8 +50,10 @@ const CommentEditModal = ({ show, handleClose, commentDetails }) => {
     }
 
     useEffect(() => {
-        setComment(commentDetails.comment);
-    }, []);
+        if (commentDetails) {
+            setComment(commentDetails.comment);
+        }
+    }, [commentDetails]);
     return (
         <div>
             <div className={`modal fade ${show ? 'show' : ''}`} tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style={{ display: show ? 'block' : 'none' }}>
