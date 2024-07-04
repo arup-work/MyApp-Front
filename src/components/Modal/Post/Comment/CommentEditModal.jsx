@@ -1,12 +1,57 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { useDropzone } from "react-dropzone";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import PostService from "../../../../services/PostService";
+import { AuthContext } from "../../../../contexts/AuthContext";
+import CommentService from "../../../../services/CommentService";
 
-const CommentEditModal = ({ show, handleClose, comment }) => {
+const CommentEditModal = ({ show, handleClose, commentDetails }) => {
+    const [comment, setComment] = useState('');
+    const [errors, setErrors] = useState({});
+    const navigate = useNavigate();
+
+    const { auth } = useContext(AuthContext);
+
+    // Validate the form
+    const validateForm = () => {
+        const newErrors = {};
+        if (!comment) {
+            newErrors.comment = 'This field is required';
+        } else if (comment.length < 6) {
+            newErrors.comment = 'Comment should be 6 character long!';
+        } else if (comment.length > 255) {
+            newErrors.comment = 'Maximum character limit is 255';
+        }
+
+        setErrors(newErrors);
+        return !Object.keys(newErrors).length;
+    }
+
+    // Handle the form
+    const handleUpdateComment = (e) => {
+        e.preventDefault();
+
+        if (validateForm()) {
+            console.log(`/post/${commentDetails.postId}`);
+            try {
+                const response = CommentService.updateComment(auth, {comment}, commentDetails._id );
+                const data = response.data;
+                if (data) {
+                    navigate(`/post/${commentDetails.postId}`, {
+                        state: {
+                            message: data.message, type: 'success'
+                        }
+                    });
+                    handleClose();
+                    setComment('');
+                } 
+            } catch (error) {
+                setErrors('An error occurred. Please try again later.');
+            }
+        }
+    }
+
     useEffect(() => {
-        console.log(comment);
-    },[]);
+        setComment(commentDetails.comment);
+    }, []);
     return (
         <div>
             <div className={`modal fade ${show ? 'show' : ''}`} tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style={{ display: show ? 'block' : 'none' }}>
@@ -25,14 +70,18 @@ const CommentEditModal = ({ show, handleClose, comment }) => {
                                         className="form-control"
                                         id="commentText"
                                         rows="3"
+                                        value={comment}
+                                        onChange={e => setComment(e.target.value)}
                                     ></textarea>
+                                    {errors.comment && <span className="text-danger">{errors.comment}</span>}
                                 </div>
-                                {/* Add more form fields as needed */}
+                                <div>
+                                </div>
                             </form>
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
-                            <button type="button" className="btn btn-primary">Save changes</button>
+                            <button type="button" className="btn btn-primary" onClick={handleUpdateComment}>Update</button>
                         </div>
                     </div>
                 </div>

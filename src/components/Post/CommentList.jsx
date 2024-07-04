@@ -11,14 +11,14 @@ import { AuthContext } from "../../contexts/AuthContext";
 
 const CommentList = ({ comments }) => {
     const [comment, setComment] = useState('');
-    const [showEditModal, setShowEditModal] = useState(false); 
+    const [showEditModal, setShowEditModal] = useState(false);
     const [commentDetails, setCommentDetails] = useState([]);
 
     const { auth } = useContext(AuthContext);
 
     const edit = async (commentId) => {
         const response = await CommentService.fetchComment(auth, commentId);
-        const comment =response.data.comment;
+        const comment = response.data.comment;
         if (comment) {
             setCommentDetails(comment);
         }
@@ -31,7 +31,7 @@ const CommentList = ({ comments }) => {
 
     useEffect(() => {
 
-    },[]);
+    }, []);
     return (
         <div>
             {comments.map((comment, index) => (
@@ -39,7 +39,7 @@ const CommentList = ({ comments }) => {
                     <p>{comment.comment}</p>
                     <div className="d-flex justify-content-end mx-2">
                         <FontAwesomeIcon icon={faEdit} onClick={(e) => edit(comment._id)} />
-                        <FontAwesomeIcon icon={faTrashAlt} className="ms-2"/>
+                        <FontAwesomeIcon icon={faTrashAlt} className="ms-2" />
                     </div>
                     <div className="d-flex justify-content-end">
                         <div>
@@ -53,12 +53,10 @@ const CommentList = ({ comments }) => {
                             <small className="text-primary">{comment.userName}</small>
                         </div>
                     </div>
-                    { comments.length  !== index + 1 && <hr />}
-
-                    { showEditModal && <CommentEditModal show={showEditModal} handleClose={handleClose} comment={commentDetails}/> }
+                    {comments.length !== index + 1 && <hr />}
                 </div>
-                
             ))}
+            {showEditModal && <CommentEditModal show={showEditModal} handleClose={handleClose} commentDetails={commentDetails} />}
         </div>
     )
 };

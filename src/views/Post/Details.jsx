@@ -55,10 +55,30 @@ const Details = () => {
         }
     }
 
+    const stateMessage = () => {
+        if (location.state?.message) {
+            if (location.state.type === 'success') {
+                toast.success(location.state.message, {
+                    position: 'top-right',
+                    className: 'foo-bar'
+                });
+            } else if (location.state.type === 'error') {
+                toast.error(location.state.message, {
+                    position: 'top-right',
+                    className: 'foo-bar'
+                });
+            }
+
+            // Clear the message from the state
+            navigate(location.pathname, { replace: true, state: {} });
+        }
+    }
+
     useEffect(() => {
         fetchPostWithComments();
         incrementViewCount();
-    }, [postId, comment])
+        stateMessage();
+    }, [location.state, postId, comment])
 
     useEffect(() => {
 
