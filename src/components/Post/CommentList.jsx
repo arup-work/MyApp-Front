@@ -5,8 +5,13 @@ import DateFormatter from "../DateFormatter";
 import CommentEditModal from "../Modal/Post/Comment/CommentEditModal";
 import CommentService from "../../services/CommentService";
 import { AuthContext } from "../../contexts/AuthContext";
+import { showConfirmationModal } from "../../helpers/utils/sweetAlertUtils";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const CommentList = ({ comments }) => {
+    const location = useLocation();
+    const navigate = useNavigate();
+
     const [comment, setComment] = useState('');
     const [showEditModal, setShowEditModal] = useState(false);
     const [commentDetails, setCommentDetails] = useState([]);
@@ -22,21 +27,41 @@ const CommentList = ({ comments }) => {
         setShowEditModal(true);
     }
 
+    const deleteComment = async (commentId, postId) => {
+        const result = await showConfirmationModal('Delete Comment', 'Are you sure you want to delete this comment?');
+        if (result.isConfirmed) {
+            try {
+                const response = await CommentService.deleteComment(auth, commentId);
+                if (response.data) {
+                    navigate(`/post/${postId}`, {
+                        state: {
+                            message: 'Comment deleted successfully',
+                            type: 'success'
+                        }
+                    })
+                }
+            } catch (error) {
+
+            }
+        }
+
+    }
+
     const handleClose = () => {
         setShowEditModal(false);
     }
 
     useEffect(() => {
 
-    }, []);
+    }, [comments]);
     return (
         <div>
             {comments.map((comment, index) => (
                 <div key={comment._id}>
                     <p>{comment.comment}</p>
                     <div className="d-flex justify-content-end mx-2">
-                        <FontAwesomeIcon icon={faEdit} onClick={(e) => edit(comment._id)} />
-                        <FontAwesomeIcon icon={faTrashAlt} className="ms-2" />
+                        <FontAwesomeIcon icon={faEdit} onClick={(e) => edit(comment._id)} role="button"/>
+                        <FontAwesomeIcon icon={faTrashAlt} className="ms-2" onClick={(e) => deleteComment(comment._id, comment.postId)} role="button"/>
                     </div>
                     <div className="d-flex justify-content-end">
                         <div>

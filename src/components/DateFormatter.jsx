@@ -39,7 +39,7 @@ const formatTimeDifference = ({ years, months, days }) => {
         formattedString += `${days} day${days > 1 ? 's' : ''}`;
     }
 
-    return formattedString ? `${formattedString} ago` : 'just now';
+    return formattedString ? `${formattedString} ago` : 'Just Now';
 };
 
 const formatDate = (dateString) => {

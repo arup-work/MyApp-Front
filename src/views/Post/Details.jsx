@@ -55,13 +55,13 @@ const Details = () => {
         if (validateForm()) {
             const response = await CommentService.store(auth, postId, {comment});
             if (response.data) {
+                setComments([response.data.comment,...comments])
                 setComment('');
             }
         }
     }
 
     const stateMessage = () => {
-        console.log("hii");
         if (location.state?.message) {
             if (location.state.type === 'success') {
                 toast.success(location.state.message, {
@@ -84,7 +84,7 @@ const Details = () => {
         fetchPostWithComments();
         incrementViewCount();
         stateMessage();
-    }, [location.state, location.pathname, navigate, postId, comment])
+    }, [location.state, location.pathname, navigate, postId])
 
     useEffect(() => {
 
