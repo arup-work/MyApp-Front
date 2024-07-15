@@ -6,9 +6,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
 import PostService from "../../services/PostService";
 import { showErrorToast } from "../../helpers/utils/toastUtils";
+import { useSelector } from "react-redux";
 
 const Create = () => {
-    const { auth } = useContext(AuthContext);
+    // const { auth } = useContext(AuthContext);
+    const { auth } = useSelector(state => state.auth);
     const [title, setTitle] = useState('');
     const [desc, setDesc] = useState('');
     const [img, setImg] = useState('');

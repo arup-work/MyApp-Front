@@ -7,6 +7,7 @@ import CommentService from "../../services/CommentService";
 import { AuthContext } from "../../contexts/AuthContext";
 import { showConfirmationModal } from "../../helpers/utils/sweetAlertUtils";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const CommentList = ({ comments }) => {
     const location = useLocation();
@@ -16,7 +17,7 @@ const CommentList = ({ comments }) => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [commentDetails, setCommentDetails] = useState([]);
 
-    const { auth } = useContext(AuthContext);
+    const { auth } = useSelector(state => state.auth);
 
     const edit = async (commentId) => {
         const response = await CommentService.fetchComment(auth, commentId);

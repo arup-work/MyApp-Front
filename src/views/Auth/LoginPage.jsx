@@ -7,6 +7,8 @@ import '../../assets/styles/AuthPage.css'
 import { AuthContext } from "../../contexts/AuthContext";
 import { showSuccessToast, showErrorToast } from "../../helpers/utils/toastUtils";
 import AuthService from "../../services/AuthService";
+import { authActions } from "../../redux/auth";
+import { useDispatch, useSelector } from "react-redux";
 
 
 
@@ -15,7 +17,11 @@ const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({});
-    const { login } = useContext(AuthContext);
+    // const { login } = useContext(AuthContext);
+    const dispatch = useDispatch();
+    const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
+
+
 
     // Validate the email
     const validateEmail = (email) => {
@@ -56,7 +62,10 @@ const LoginPage = () => {
         if (validateForm()) {
             const response = await AuthService.login(email, password);
             if (response.data) {
-                login(response.data.token, response.data.user);
+                // login(response.data.token, response.data.user);
+                dispatch(authActions.login({
+                    token: response.data.token, user: response.data.user
+                }));
                 resetForm();
             } else {
                 setPassword('');
@@ -66,6 +75,7 @@ const LoginPage = () => {
     }
 
     useEffect(() => {
+        
         if (location.state?.message) {
             if (location.state.type === 'success') {
                 showSuccessToast(location.state.message);

@@ -1,11 +1,17 @@
 import React, { useContext } from "react";
+import { useDispatch } from "react-redux";
+
 import { AuthContext } from "../../../contexts/AuthContext";
+import { authActions } from "../../../redux/auth";
+
 
 const LogoutModal = ({ show, handleClose }) => {
-    const { logout } = useContext(AuthContext);
+    // const { logout } = useContext(AuthContext);
+    const dispatch = useDispatch();
 
     const handleLogout = () => {
-        logout();
+        // logout();
+        dispatch(authActions.logout());
         handleClose();
     }
 

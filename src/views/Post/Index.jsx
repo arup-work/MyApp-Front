@@ -11,6 +11,7 @@ import AuthService from "../../services/AuthService";
 import PostService from "../../services/PostService";
 import { showConfirmationModal, showSuccessModal } from "../../helpers/utils/sweetAlertUtils";
 import { AuthContext } from "../../contexts/AuthContext";
+import { useSelector } from "react-redux";
 
 
 const Index = () => {
@@ -25,7 +26,8 @@ const Index = () => {
     const [postDetails, setPostDetails] = useState([]);
     const [viewMode, setViewMode] = useState(false);
 
-    const { auth } = useContext(AuthContext);
+    // const { auth } = useContext(AuthContext);
+    const { auth } = useSelector(state => state.auth);
 
 
     const handlePageChange = (page) => {

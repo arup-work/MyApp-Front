@@ -1,5 +1,7 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useSelector } from "react-redux";
+
 import { AuthContext } from '../contexts/AuthContext';
 import LoginPage from "../views/Auth/LoginPage";
 import RegisterPage from '../views/Auth/RegisterPage';
@@ -12,55 +14,57 @@ import PostDetails from "../views/Post/Details";
 import ForgetPassword from '../views/Auth/ForgetPassword';
 import ResetPassword from '../views/Auth/ResetPassword';
 import VerifyEmail from "../views/Auth/VerifyEmail";
+import ProtectedRoute from "./ProtectedRoute";
 
 const AppRoutes = () => {
-    const { auth } = useContext(AuthContext);
-
+    // const { auth } = useContext(AuthContext);
+    const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
+    
     return (
         <Routes>
             <Route
                 path='/login'
-                element={!auth.token ? <LoginPage /> : <Navigate to="/" />}
+                element={!isAuthenticated ? <LoginPage /> : <Navigate to="/" />}
             />
             <Route
                 path='/register'
-                element={!auth.token ? <RegisterPage /> : <Navigate to="/" />}
+                element={!isAuthenticated ? <RegisterPage /> : <Navigate to="/" />}
             />
             <Route
                 path='/verify-email/:token'
-                element={!auth.token ? <VerifyEmail /> : <Navigate to="/" />}
+                element={!isAuthenticated ? <VerifyEmail /> : <Navigate to="/" />}
             />
             <Route
                 path='/profile'
-                element={auth.token ? <ProfileIndex /> : <Navigate to="/login" />}
+                element={isAuthenticated ? <ProfileIndex /> : <Navigate to="/login" />}
             />
 
             <Route
                 path='/forget-password'
-                element={!auth.token ? <ForgetPassword /> : <Navigate to="/" />}
+                element={!isAuthenticated ? <ForgetPassword /> : <Navigate to="/" />}
 
             />
             <Route
                 path='/reset-password/:token'
-                element={!auth.token ? <ResetPassword /> : <Navigate to="/" />}
+                element={!isAuthenticated ? <ResetPassword /> : <Navigate to="/" />}
             />
 
             <Route
                 path="/"
-                element={auth.token ? <Index /> : <Navigate to="/login" />}
+                element={<ProtectedRoute><Index /></ProtectedRoute>}
             />
 
             <Route 
                 path="/post/create"
-                element={auth.token ? <Create /> : <Navigate to="/login" />}
+                element={isAuthenticated ? <Create /> : <Navigate to="/login" />}
             />
             <Route 
                 path="/post"
-                element={auth.token ? <PostIndex /> : <Navigate to="/login" />}
+                element={isAuthenticated ? <PostIndex /> : <Navigate to="/login" />}
             />
             <Route 
                 path="/post/:postId"
-                element={auth.token ? <PostDetails /> : <Navigate to="/login" />}
+                element={isAuthenticated ? <PostDetails /> : <Navigate to="/login" />}
             />
         </Routes>
     )

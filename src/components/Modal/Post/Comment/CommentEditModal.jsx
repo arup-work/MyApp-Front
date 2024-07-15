@@ -2,13 +2,15 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../../contexts/AuthContext";
 import CommentService from "../../../../services/CommentService";
+import { useSelector } from "react-redux";
 
 const CommentEditModal = ({ show, handleClose, commentDetails }) => {
     const [comment, setComment] = useState('');
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
 
-    const { auth } = useContext(AuthContext);
+    // const { auth } = useContext(AuthContext);
+    const { auth } = useSelector(state => state.auth);
 
     // Validate the form
     const validateForm = () => {

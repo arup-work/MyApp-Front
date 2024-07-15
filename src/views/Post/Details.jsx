@@ -9,6 +9,7 @@ import '../../assets/styles/PostPage.css';
 import DateFormatter from "../../components/DateFormatter";
 import CommentList from "../../components/Post/CommentList";
 import CommentService from "../../services/CommentService";
+import { useSelector } from "react-redux";
 
 const Details = () => {
     const location = useLocation();
@@ -21,7 +22,8 @@ const Details = () => {
     const [comment, setComment] = useState('');
     const [errors, setErrors] = useState({});
 
-    const { auth } = useContext(AuthContext);
+    // const { auth } = useContext(AuthContext);
+    const { auth } = useSelector(state => state.auth);
 
     const fetchPostWithComments = async () => {
         const response = await PostService.fetchPostWithComments(auth, postId);
@@ -41,9 +43,9 @@ const Details = () => {
         const newErrors = {};
         if (!comment) {
             newErrors.comment = 'This field is required';
-        }else if(comment.length < 15) {
+        } else if (comment.length < 15) {
             newErrors.comment = 'Comment must be 15 character long!'
-        }else if(comment.length > 255){
+        } else if (comment.length > 255) {
             newErrors.comment = 'Maximum character limit is 255!'
         }
 
@@ -53,9 +55,9 @@ const Details = () => {
     const handleAddComment = async (e) => {
         e.preventDefault();
         if (validateForm()) {
-            const response = await CommentService.store(auth, postId, {comment});
+            const response = await CommentService.store(auth, postId, { comment });
             if (response.data) {
-                setComments([response.data.comment,...comments])
+                setComments([response.data.comment, ...comments])
                 setComment('');
             }
         }
@@ -115,18 +117,23 @@ const Details = () => {
                                         </div>
                                     </div>
                                 </div>
+                                <hr className="mt-2" />
                                 <div className="post-mg mt-2">
-                                    <img src={post.image} alt="image" className="full-width-height" />
+                                    <div className="image-container">
+                                        <img src={post.image} alt="image" className="post-img" />
+                                    </div>
                                 </div>
-                                <div className="post-description mb-2">
-                                    {post.description}
+
+                                <div className="post-description mx-2 my-3">
+                                    <b className="text-muted">Description </b><br />
+                                   {post.description}
                                 </div>
                                 <div className="comments-section mt-2">
                                     <h4 className="comments-count mb-4">Your Comments</h4>
                                     <form onSubmit={handleAddComment}>
                                         <div>
                                             <textarea name="comment" id="comment" cols={5} className="form-control" value={comment} onChange={(e) => setComment(e.target.value)}></textarea>
-                                            { errors.comment && <span className="text-danger">{errors.comment}</span>}
+                                            {errors.comment && <span className="text-danger">{errors.comment}</span>}
                                         </div>
                                         <div className="float-end">
                                             <button type="submit" className="btn btn-primary mt-2">Add comment</button>

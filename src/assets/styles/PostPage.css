@@ -37,3 +37,40 @@
 .container {
     margin-top: 20px;
 }
+
+.post-mg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.image-container {
+    position: relative;
+    z-index: 1;
+}
+
+.post-img {
+    width: auto;
+    height: auto;
+    max-width: 300px;
+    max-height: 400px;
+    object-fit: contain;
+    position: relative;
+    z-index: 2;
+}
+
+/* Pseudo-element for the blur effect */
+.post-mg::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color:#cccccc2b; /* Replace "image" with the path to your image */
+    background-size: cover;
+    filter: blur(10px); /* Adjust the blur amount as needed */
+    z-index: 0;
+}
