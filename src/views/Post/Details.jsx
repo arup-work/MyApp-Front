@@ -10,6 +10,7 @@ import DateFormatter from "../../components/DateFormatter";
 import CommentList from "../../components/Post/CommentList";
 import CommentService from "../../services/CommentService";
 import { useSelector } from "react-redux";
+import { Pagination } from "react-bootstrap";
 
 const Details = () => {
     const location = useLocation();
@@ -22,14 +23,19 @@ const Details = () => {
     const [comment, setComment] = useState('');
     const [errors, setErrors] = useState({});
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPage, setTotalPage] = useState(1);
+    const [postsPerPage] = useState(5);
+
     // const { auth } = useContext(AuthContext);
     const { auth } = useSelector(state => state.auth);
 
     const fetchPostWithComments = async () => {
-        const response = await PostService.fetchPostWithComments(auth, postId);
-        const data = response.data;
-        setComments(data.comments);
-        setPost(data.post.post);
+        const response = await PostService.fetchPostWithComments(auth, postId, currentPage, postsPerPage);
+        const result = response.data;
+        setComments(result.data.comments);
+        setPost(result.data.post);
+        setTotalPage(result.data.totalPage);
     }
 
     const incrementViewCount = async () => {
@@ -82,11 +88,17 @@ const Details = () => {
         }
     }
 
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPage) {
+            setCurrentPage(page);
+        }
+    }
+
     useEffect(() => {
         fetchPostWithComments();
         incrementViewCount();
         stateMessage();
-    }, [location.state, location.pathname, navigate, postId])
+    }, [location.state, location.pathname, navigate, postId, currentPage, postsPerPage])
 
     useEffect(() => {
 
@@ -144,6 +156,11 @@ const Details = () => {
                                     <h4 className="comments-count mb-4">{comments.length} Comments</h4>
                                     <CommentList comments={comments} />
                                 </div>
+                                {/* <Pagination
+                                    currentPage={currentPage}
+                                    totalPage={totalPage}
+                                    onPageChange={handlePageChange}
+                                /> */}
                             </div>
                         </div>
                     </div>

@@ -17,6 +17,7 @@ const CommentList = ({ comments }) => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [commentDetails, setCommentDetails] = useState([]);
 
+
     const { auth } = useSelector(state => state.auth);
 
     const edit = async (commentId) => {

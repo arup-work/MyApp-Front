@@ -99,7 +99,7 @@ export default class PostService {
         }
     }
 
-    static async fetchPostWithComments(auth, postId){
+    static async fetchPostWithComments(auth, postId, currentPage, postsPerPage){
         try {
             const bearerToken = { 'Authorization': `Bearer ${auth.token}` };
             const response = await apiRequest(`post/${postId}/comments`,'GET', null, bearerToken);
