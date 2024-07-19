@@ -61,10 +61,13 @@ const CommentList = ({ comments }) => {
             {comments.map((comment, index) => (
                 <div key={comment._id}>
                     <p>{comment.comment}</p>
-                    <div className="d-flex justify-content-end mx-2">
-                        <FontAwesomeIcon icon={faEdit} onClick={(e) => edit(comment._id)} role="button"/>
-                        <FontAwesomeIcon icon={faTrashAlt} className="ms-2" onClick={(e) => deleteComment(comment._id, comment.postId)} role="button"/>
-                    </div>
+                    { auth.user.id == comment.userId._id && (
+                         <div className="d-flex justify-content-end mx-2">
+                         <FontAwesomeIcon icon={faEdit} onClick={(e) => edit(comment._id)} role="button"/>
+                         <FontAwesomeIcon icon={faTrashAlt} className="ms-2" onClick={(e) => deleteComment(comment._id, comment.postId)} role="button"/>
+                     </div>
+                    )}
+                   
                     <div className="d-flex justify-content-end">
                         <div>
                             <small>
