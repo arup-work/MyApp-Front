@@ -121,7 +121,7 @@ const Details = () => {
                                         </div>
                                         <div className="col-4">
                                             <span className="text-muted">Modified: </span>
-                                            <DateFormatter date={post.updatedAt}></DateFormatter>
+                                            <DateFormatter date={post.modifiedAt}></DateFormatter>
                                         </div>
                                         <div className="col-4">
                                             <span className="text-muted">Viewed: </span>
