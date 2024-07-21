@@ -128,7 +128,12 @@ const Index = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {posts.map((post, index) => (
+                        { posts.length == 0 && (
+                            <tr>
+                                <td colSpan={5} className="text-center">No data found</td>
+                            </tr>
+                        )}
+                        { posts.length > 0 && posts.map((post, index) => (
                             <tr key={post._id}>
                                 <td>{index + 1}</td>
                                 <td>

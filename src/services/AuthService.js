@@ -15,7 +15,7 @@ const AuthService = {
     },
 
     async register(name, email, password, confirmPassword) {
-        const response = await apiRequest('/auth/register', 'POST', { name, email, password, confirmPassword });
+        const response = await apiRequest('auth/register', 'POST', { name, email, password, confirmPassword });
         if (response.ok) {
             showSuccessToast('Registration successful');
             return { data: response.data, error: null };

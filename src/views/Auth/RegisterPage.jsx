@@ -4,7 +4,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Link, useNavigate } from "react-router-dom";
 
 import '../../assets/styles/AuthPage.css';
-import { AuthContext } from "../../contexts/AuthContext";
 import AuthService from "../../services/AuthService";
 
 
@@ -14,7 +13,6 @@ const RegisterPage = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [errors, setErrors] = useState({});
-    const { login } = useContext(AuthContext)
     const navigate = useNavigate();
 
     // Validate the email
@@ -28,6 +26,8 @@ const RegisterPage = () => {
         const newErrors = {};
         if (!name) {
             newErrors.name = 'Name is required'
+        }else if(name.length < 6) {
+            newErrors.name = 'Name must be 6 characters long!'
         }
         if (!email) {
             newErrors.email = 'Email is required'

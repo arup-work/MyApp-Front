@@ -1,12 +1,14 @@
 import React, { useContext, useState } from "react";
-import { AuthContext } from "../../../contexts/AuthContext";
+// import { AuthContext } from "../../../contexts/AuthContext";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AuthService from "../../../services/AuthService";
+import { useSelector } from "react-redux";
 
 
 const Index = () => {
-    const { auth } = useContext(AuthContext);
+    // const { auth } = useContext(AuthContext);
+    const { auth } = useSelector(state => state.auth);
     const [currentPassword, setCurrentPassword] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');

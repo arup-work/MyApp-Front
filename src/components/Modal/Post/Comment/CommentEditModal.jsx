@@ -32,7 +32,6 @@ const CommentEditModal = ({ show, handleClose, commentDetails }) => {
         e.preventDefault();
         const postId = commentDetails.postId;
         if (validateForm()) {
-            console.log(`/post/${postId}`);
             try {
                 const response = await CommentService.updateComment(auth, comment, commentDetails._id);
                 const data = response.data;
