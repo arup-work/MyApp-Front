@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -9,8 +10,8 @@ import '../../assets/styles/PostPage.css';
 import DateFormatter from "../../components/DateFormatter";
 import CommentList from "../../components/Post/CommentList";
 import CommentService from "../../services/CommentService";
-import { useSelector } from "react-redux";
-import { Pagination } from "react-bootstrap";
+import Pagination from "../../components/Pagination";
+
 
 const Details = () => {
     const location = useLocation();
@@ -25,17 +26,20 @@ const Details = () => {
 
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPage, setTotalPage] = useState(1);
+    const [totalComment, setTotalComment] = useState(0);
     const [postsPerPage] = useState(5);
+    const [searchKey, setSearchKey] = useState('');
 
     // const { auth } = useContext(AuthContext);
     const { auth } = useSelector(state => state.auth);
 
-    const fetchPostWithComments = async () => {
-        const response = await PostService.fetchPostWithComments(auth, postId, currentPage, postsPerPage);
+    const fetchPostWithComments = async (searchKey = '') => {
+        const response = await PostService.fetchPostWithComments(auth, postId, currentPage, postsPerPage, searchKey);
         const result = response.data;
         setComments(result.data.comments);
         setPost(result.data.post);
         setTotalPage(result.data.totalPage);
+        setTotalComment(result.data.totalComments);
     }
 
     const incrementViewCount = async () => {
@@ -65,6 +69,7 @@ const Details = () => {
             if (response.data) {
                 setComments([response.data.comment, ...comments])
                 setComment('');
+                setTotalComment(response.data.totalComments)
             }
         }
     }
@@ -92,6 +97,10 @@ const Details = () => {
         if (page >= 1 && page <= totalPage) {
             setCurrentPage(page);
         }
+    }
+
+    const handleSearch = (searchKey) => {
+        fetchPostWithComments(searchKey);
     }
 
     useEffect(() => {
@@ -138,7 +147,7 @@ const Details = () => {
 
                                 <div className="post-description mx-2 my-3">
                                     <b className="text-muted">Description </b><br />
-                                   {post.description}
+                                    {post.description}
                                 </div>
                                 <div className="comments-section mt-2">
                                     <h4 className="comments-count mb-4">Your Comments</h4>
@@ -153,14 +162,23 @@ const Details = () => {
                                     </form>
                                 </div>
                                 <div className="comments-section mt-2">
-                                    <h4 className="comments-count mb-4">{comments.length} Comments</h4>
+                                    <div className="row">
+                                        <div className="col-8">
+                                            <h4 className="comments-count mb-4">{totalComment} Comments</h4>
+                                        </div>
+                                        <div className="col-4">
+
+                                            <input type="text" className="form-control" onChange={e => handleSearch(e.target.value)}/>
+                                        </div>
+                                    </div>
+
                                     <CommentList comments={comments} />
                                 </div>
-                                {/* <Pagination
+                                <Pagination
                                     currentPage={currentPage}
                                     totalPage={totalPage}
                                     onPageChange={handlePageChange}
-                                /> */}
+                                />
                             </div>
                         </div>
                     </div>

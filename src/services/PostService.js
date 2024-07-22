@@ -99,10 +99,10 @@ export default class PostService {
         }
     }
 
-    static async fetchPostWithComments(auth, postId, currentPage, postsPerPage){
+    static async fetchPostWithComments(auth, postId, currentPage, postsPerPage, searchKey){
         try {
             const bearerToken = { 'Authorization': `Bearer ${auth.token}` };
-            const response = await apiRequest(`post/${postId}/comments`,'GET', null, bearerToken);
+            const response = await apiRequest(`post/${postId}/comments?page=${currentPage}&limit=${postsPerPage}&search=${searchKey}`,'GET', null, bearerToken);
             if (response.ok) {
                 const data = response.data;
                 showSuccessToast(response.message);
