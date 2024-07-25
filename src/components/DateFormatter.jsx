@@ -4,6 +4,13 @@ const calculateTimeDifference = (date) => {
     const now = new Date();
     const givenDate = new Date(date);
 
+    const diffInMs = now - givenDate;
+    const diffInSeconds = Math.floor(diffInMs / 1000);
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    const diffInHours = Math.floor(diffInMinutes / 60);
+
+    const isToday = now.toDateString() === givenDate.toDateString();
+ 
     let years = now.getFullYear() - givenDate.getFullYear();
     let months = now.getMonth() - givenDate.getMonth();
     let days = now.getDate() - givenDate.getDate();
@@ -19,10 +26,20 @@ const calculateTimeDifference = (date) => {
         months += 12;
     }
 
-    return { years, months, days };
+    return { years, months, days, isToday, diffInSeconds, diffInMinutes, diffInHours };
 };
 
-const formatTimeDifference = ({ years, months, days }) => {
+const formatTimeDifference = ({ years, months, days, isToday, diffInSeconds, diffInMinutes, diffInHours  }) => {
+    if (isToday) {
+        if (diffInSeconds < 60) {
+            return 'Just now';
+        }else if (diffInMinutes < 60) {
+            return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
+        }else{
+            return `${diffInHours} hour${diffInHours > 1 ? 's' : ''}`;
+        }
+    }
+
     let formattedString = '';
 
     if (years > 0) {
