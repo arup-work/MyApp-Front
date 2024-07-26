@@ -2,10 +2,10 @@ import apiRequest from "../helpers/utils/api";
 import { showErrorToast, showSuccessToast } from "../helpers/utils/toastUtils";
 
 export default class PostService {
-    static async index(auth, currentPage, postsPerPage) {
+    static async index(auth, currentPage, postsPerPage, searchKey) {
         try {
             const bearerToken = { 'Authorization': `Bearer ${auth.token}` };
-            const response = await apiRequest(`/post?page=${currentPage}&limit=${postsPerPage}`,'GET', null, bearerToken);
+            const response = await apiRequest(`/post?page=${currentPage}&limit=${postsPerPage}&search=${searchKey}`,'GET', null, bearerToken);
             if (response.ok) {
                 const data = response.data;
                 showSuccessToast(response.message);

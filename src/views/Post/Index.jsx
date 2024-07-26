@@ -21,6 +21,7 @@ const Index = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPage, setTotalPage] = useState(1);
     const [postsPerPage] = useState(5);
+    const [message, setMessage] = useState('');
 
     const [showEditModal, setShowEditModal] = useState(false);
     const [postDetails, setPostDetails] = useState([]);
@@ -84,13 +85,23 @@ const Index = () => {
         }
     }
     // Fetch posts 
-    const fetchPosts = async () => {
-        const response = await PostService.index(auth, currentPage, postsPerPage);
+    const fetchPosts = async (searchKey = '') => {
+        const response = await PostService.index(auth, currentPage, postsPerPage, searchKey);
         if (response.data) {
             const data = response.data;
             setPosts(data.posts.post);
             setTotalPage(data.posts.totalPage);
+            setMessage(data.posts.message);
         }
+    }
+
+    const handleClose = () => {
+        setShowEditModal(false);
+    }
+
+    const handleSearch = (searchKey) => {
+        fetchPosts(searchKey);
+        setSearchKey(searchKey);
     }
 
     useEffect(() => {
@@ -98,9 +109,7 @@ const Index = () => {
         fetchPosts();
     }, [location.state, location.pathname, auth, navigate, currentPage, postsPerPage]);
 
-    const handleClose = () => {
-        setShowEditModal(false);
-    }
+
 
 
     return (
@@ -108,12 +117,18 @@ const Index = () => {
             <ToastContainer />
             <div className="row ">
                 <div className="d-flex justify-content-center">
-                    <h2>All Posts</h2>
+                    <h2>Al Posts</h2>
                 </div>
             </div>
             <div className="row ">
-                <div className="col-2">
+                <div className="col-9">
                     <Link to={'/post/create'} className="btn btn-primary"> <FontAwesomeIcon icon={faPlus} /><span className="ms-2">Create</span></Link>
+
+                </div>
+                <div className="col-3">
+                    <input type="text" className="form-control" placeholder="Search..."
+                        onChange={e => handleSearch(e.target.value)}
+                    />
                 </div>
             </div>
             <div className="mt-2">
@@ -128,12 +143,12 @@ const Index = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        { posts.length == 0 && (
+                        {posts.length == 0 && (
                             <tr>
                                 <td colSpan={5} className="text-center">No data found</td>
                             </tr>
                         )}
-                        { posts.length > 0 && posts.map((post, index) => (
+                        {posts.length > 0 && posts.map((post, index) => (
                             <tr key={post._id}>
                                 <td>{index + 1}</td>
                                 <td>
@@ -160,11 +175,23 @@ const Index = () => {
                         ))}
                     </tbody>
                 </table>
-                <Pagination
-                    currentPage={currentPage}
-                    totalPage={totalPage}
-                    onPageChange={handlePageChange}
-                />
+                <div className="row">
+                    <div className="col-8">
+                        {(
+                            <span>
+                                {message}
+                            </span>
+                        )}
+                    </div>
+                    <div className="col-4 float-end justify-content-end">
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPage={totalPage}
+                            onPageChange={handlePageChange}
+                        />
+                    </div>
+                </div>
+
             </div>
             {showEditModal && <PostEditModal show={showEditModal} handleClose={handleClose} postDetails={postDetails} viewMode={viewMode} />}
         </div>
