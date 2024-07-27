@@ -1,0 +1,73 @@
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh; /* Full viewport height */
+}
+
+.sidebar {
+  width: 200px;
+  height: 100vh; /* Full viewport height */
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #f8f9fa; /* Adjust according to your design */
+  z-index: 100; /* Ensure it stays below the navbar */
+}
+
+.content-area {
+  margin-left: 200px; /* Same width as the sidebar */
+  width: calc(100% - 200px); /* Full width minus the sidebar width */
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 16px; /* Adjust based on your needs */
+  overflow-y: auto;
+  background-color: #e9ecef; /* Adjust according to your design */
+}
+
+.bg-white {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+}
+
+.py-\[20px\] {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+/* Ensure the Navbar has no bottom margin */
+.navbar {
+  margin-bottom: 0;
+}
+
+/* Adjust padding inside the container */
+.container.py-3.px-0 {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+
+
+/* Higher specificity to ensure styles are applied */
+.sidebar .nav-link.bg-activeLinkBg {
+  --tw-bg-opacity: 1;
+  background-color: rgb(56 68 85 / var(--tw-bg-opacity));
+  border-radius: 15px;
+}
+
+.sidebar .nav-link.bg-activeLinkBg.text-activeLinkText {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+.sidebar .nav-link {
+  color: #000;
+  transition: background-color 0.3s ease;
+}

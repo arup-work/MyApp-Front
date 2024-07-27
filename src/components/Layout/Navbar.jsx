@@ -1,4 +1,4 @@
-import React, { useContext, useState }  from "react";
+import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { Navbar, Nav, NavDropdown, Container } from 'react-bootstrap';
 import { useSelector } from "react-redux";
@@ -24,20 +24,14 @@ const NavigationBar = () => {
 
 
     return (
-        <Navbar bg="light" expand="lg">
+        <Navbar expand="lg">
             <Container>
-                <Navbar.Brand as={Link} to="/">MyApp</Navbar.Brand>
+                {/* <Navbar.Brand as={Link} to="/">MyApp</Navbar.Brand> */}
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
-                    <Nav className="me-auto">
-                    { isAuthenticated ?
-                        <Nav.Link as={Link} to="/post">Post</Nav.Link> 
-                        : ''
-                    }
-                    </Nav>
-                    <Nav>
+                    <Nav className="ms-auto">
                         {isAuthenticated ? (
-                            <NavDropdown title={auth.user.name} id="basic-nav-dropdown">
+                            <NavDropdown title={auth.user.name} id="basic-nav-dropdown" align="end">
                                 <NavDropdown.Item as={Link} to="/profile">Profile</NavDropdown.Item>
                                 <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
                             </NavDropdown>
@@ -50,7 +44,7 @@ const NavigationBar = () => {
                     </Nav>
                 </Navbar.Collapse>
             </Container>
-            <LogoutModal show={showModal} handleClose={handleClose}/>
+            <LogoutModal show={showModal} handleClose={handleClose} />
         </Navbar>
     );
 };

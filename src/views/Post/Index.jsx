@@ -1,17 +1,19 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Pagination from "../../components/Pagination";
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faTrashAlt, faEye } from '@fortawesome/free-solid-svg-icons';
 
+import Pagination from "../../components/Pagination";
 import PostEditModal from "../../components/Modal/Post/PostEditModal";
 import AuthService from "../../services/AuthService";
 import PostService from "../../services/PostService";
 import { showConfirmationModal, showSuccessModal } from "../../helpers/utils/sweetAlertUtils";
 import { AuthContext } from "../../contexts/AuthContext";
-import { useSelector } from "react-redux";
+import '../../assets/styles/PostPage.css';
 
 
 const Index = () => {
@@ -90,7 +92,7 @@ const Index = () => {
         const response = await PostService.index(auth, currentPage, postsPerPage, searchKey);
         if (response.data) {
             const data = response.data;
-            setPosts(data.posts.post);
+            setPosts(data.posts.post || []);
             setTotalPage(data.posts.totalPage);
             setMessage(data.posts.message);
         }
@@ -126,7 +128,7 @@ const Index = () => {
             <ToastContainer />
             <div className="row ">
                 <div className="d-flex justify-content-center">
-                    <h2>Al Posts</h2>
+                    <h2>All Posts</h2>
                 </div>
             </div>
             <div className="row ">
@@ -134,23 +136,21 @@ const Index = () => {
                     <Link to={'/post/create'} className="btn btn-primary"> <FontAwesomeIcon icon={faPlus} /><span className="ms-2">Create</span></Link>
 
                 </div>
-                <div className="col-3">
-                    <div className="input-group">
+                <div className="col-3 head_search">
+                    <div className="position-relative">
 
                         <input
                             type="text"
-                            className="form-control"
                             placeholder="Search..."
                             value={searchedPost}
                             onChange={e => handleInputChange(e.target.value)}
+                            className="head_search bg-sidebar_bg text-textColorBlack bg-gray-50 border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 p-2 me-2"
                         />
                         {searchedPost !== '' &&
                             <>
-                                <div className="input-group-append">
-                                    <button className="btn btn-outline-secondary">
-                                        <img src="/assets/images/dark_cross.svg" alt="Clear" style={{ width: '10px' }} onClick={clearSearch} />
-                                    </button>
-                                </div>
+                                <button className="position-absolute top-50 end-0 translate-middle-y me-2 border-0 bg-transparent" onClick={clearSearch} style={{ outline: 'none' }}>
+                                    <img src="/assets/images/dark_cross.svg" alt="Clear" className="right-2.5 bottom-2.5 " />
+                                </button>
                             </>
                         }
                     </div>
@@ -161,7 +161,6 @@ const Index = () => {
                 <table className="table table-bordered">
                     <thead>
                         <tr>
-                            <th>Id</th>
                             <th>Title</th>
                             <th>Description</th>
                             <th>Image</th>
@@ -169,14 +168,13 @@ const Index = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {posts.length == 0 && (
+                        {!posts || (posts && posts.length == 0) && (
                             <tr>
                                 <td colSpan={5} className="text-center">No data found</td>
                             </tr>
                         )}
-                        {posts.length > 0 && posts.map((post, index) => (
+                        {posts && posts.length > 0 && posts.map((post, index) => (
                             <tr key={post._id}>
-                                <td>{index + 1}</td>
                                 <td>
                                     <Link to={`/post/${post._id}`} className="text-decoration-none">{post.title}</Link>
                                 </td>

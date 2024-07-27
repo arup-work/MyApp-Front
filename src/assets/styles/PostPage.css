@@ -74,3 +74,55 @@
     filter: blur(10px); /* Adjust the blur amount as needed */
     z-index: 0;
 }
+
+/* Post search */
+.head_search input {
+    border-radius: 16px !important;
+    border: solid 1px transparent;
+    padding: 15px 70px 15px 20px;
+    margin: 0;
+    font-size: 16px;
+}
+
+.head_search input:focus {
+    border: solid 1px transparent;
+    outline: none;
+    box-shadow: none;
+}
+
+.focus\:ring-blue-500:focus {
+    --tw-ring-opacity: 1;
+    --tw-ring-color: rgb(63 131 248 / var(--tw-ring-opacity));
+}
+.focus\:border-blue-500:focus {
+    --tw-border-opacity: 1;
+    border-color: rgb(63 131 248 / var(--tw-border-opacity));
+}
+
+.text-textColorBlack {
+    --tw-text-opacity: 1;
+    color: rgb(0 0 0 / var(--tw-text-opacity));
+}
+
+.bg-sidebar_bg {
+    --tw-bg-opacity: 1;
+    background-color: rgb(245 245 248 / var(--tw-bg-opacity));
+}
+
+.border-gray-300 {
+    --tw-border-opacity: 1;
+    border-color: rgb(209 213 219 / var(--tw-border-opacity));
+}
+
+.w-full {
+    width: 100%;
+}
+
+.right-2\.5 {
+    right: .625rem;
+}
+
+.bottom-2\.5 {
+    bottom: .625rem;
+}
+
