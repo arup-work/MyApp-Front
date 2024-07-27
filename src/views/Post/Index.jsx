@@ -22,6 +22,7 @@ const Index = () => {
     const [totalPage, setTotalPage] = useState(1);
     const [postsPerPage] = useState(5);
     const [message, setMessage] = useState('');
+    const [searchedPost, setSearchPost] = useState('');
 
     const [showEditModal, setShowEditModal] = useState(false);
     const [postDetails, setPostDetails] = useState([]);
@@ -99,9 +100,17 @@ const Index = () => {
         setShowEditModal(false);
     }
 
+    const handleInputChange = (value) => {
+        setSearchPost(value);
+        handleSearch(value);
+    }
     const handleSearch = (searchKey) => {
         fetchPosts(searchKey);
-        setSearchKey(searchKey);
+    }
+
+    const clearSearch = () => {
+        setSearchPost('');
+        handleSearch('');
     }
 
     useEffect(() => {
@@ -126,9 +135,26 @@ const Index = () => {
 
                 </div>
                 <div className="col-3">
-                    <input type="text" className="form-control" placeholder="Search..."
-                        onChange={e => handleSearch(e.target.value)}
-                    />
+                    <div className="input-group">
+
+                        <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Search..."
+                            value={searchedPost}
+                            onChange={e => handleInputChange(e.target.value)}
+                        />
+                        {searchedPost !== '' &&
+                            <>
+                                <div className="input-group-append">
+                                    <button className="btn btn-outline-secondary">
+                                        <img src="/assets/images/dark_cross.svg" alt="Clear" style={{ width: '10px' }} onClick={clearSearch} />
+                                    </button>
+                                </div>
+                            </>
+                        }
+                    </div>
+
                 </div>
             </div>
             <div className="mt-2">
