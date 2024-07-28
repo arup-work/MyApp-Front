@@ -10,6 +10,7 @@ import AppRoutes from './routes/AppRoutes';
 import { AuthContext } from './contexts/AuthContext'
 import NavigationBar from './components/Layout/Navbar'
 import Sidebar from './components/Layout/Sidebar';
+import Footer from './components/Layout/Footer';
 import './assets/styles/App.css';
 
 
@@ -23,12 +24,19 @@ function App() {
     <Router>
       <div className="app-container">
         {isAuthenticated && <Sidebar />}
-        <div className="content-area">
-          {isAuthenticated && <NavigationBar />}
+        {isAuthenticated ? (
+          <div className="content-area">
+            <NavigationBar />
+            <div className="main-content">
+              <AppRoutes />
+            </div>
+          </div>
+        ) : (
           <div className="main-content">
             <AppRoutes />
           </div>
-        </div>
+        )}
+        <Footer />
       </div>
     </Router >
   )

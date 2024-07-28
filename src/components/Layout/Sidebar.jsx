@@ -14,7 +14,10 @@ const Sidebar = () => {
     const location = useLocation();
 
     const getNavLinkClass = (path) => {
-        return location.pathname === path ? 'nav-link bg-activeLinkBg text-activeLinkText' : 'nav-link';
+        if (path === '/') {
+            return location.pathname === path ? 'nav-link bg-activeLinkBg text-activeLinkText' : 'nav-link';
+        }
+        return location.pathname.startsWith(path) ? 'nav-link bg-activeLinkBg text-activeLinkText' : 'nav-link';
     }
 
     return (

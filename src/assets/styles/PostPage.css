@@ -1,4 +1,3 @@
-/* Example CSS */
 .full-width-height {
     width: 100%;
     height: auto;
@@ -124,5 +123,10 @@
 
 .bottom-2\.5 {
     bottom: .625rem;
+}
+
+.post-create .btn-round{
+    padding: 8px 10px;
+    border-radius: 15px;
 }
 

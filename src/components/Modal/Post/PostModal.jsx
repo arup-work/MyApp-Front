@@ -1,9 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+
 import { useDropzone } from "react-dropzone";
 import { useNavigate } from "react-router-dom";
 import PostService from "../../../services/PostService";
 
-const PostEditModal = ({ show, handleClose, postDetails, viewMode }) => {
+const PostModal = ({ show, handleClose, postDetails, viewMode, createMode }) => {
+    const { auth } = useSelector(state => state.auth);
+
     const [postId, setPostId] = useState('');
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -16,7 +20,6 @@ const PostEditModal = ({ show, handleClose, postDetails, viewMode }) => {
     const onDrop = useCallback(acceptedFiles => {
         if (acceptedFiles.length > 0) {
             const file = acceptedFiles[0];
-            console.log(file);
             if (!['image/png', 'image/jpg', 'image/jpeg'].includes(file.type)) {
                 setErrors(prevErrors => ({ ...prevErrors, image: 'Only PNG,  and JPEG files are allowed' }));
                 return;
@@ -48,6 +51,14 @@ const PostEditModal = ({ show, handleClose, postDetails, viewMode }) => {
             newErrors.description = "The title must contain 12 characters";
         }
 
+        if (createMode) {
+            if (!image) {
+                newErrors.image = "This field is required";
+            } else if (!['image/png', 'image/jpg', 'image/jpeg'].includes(image.type)) {
+                newErrors.image = "Only PNG, JPG and JPEG files are allowed";
+            }
+        }
+
         if (image && !['image/png', 'image/jpg', 'image/jpeg'].includes(image.type)) {
             newErrors.image = "Only PNG, JPG and JPEG files are allowed";
         }
@@ -75,7 +86,12 @@ const PostEditModal = ({ show, handleClose, postDetails, viewMode }) => {
             formData.append('file', image);
 
             try {
-                const response = await PostService.update(postId, formData);
+                let response;
+                if (createMode) {
+                    response = await PostService.store(auth,formData);
+                }else{
+                    response = await PostService.update(postId, formData);
+                }
                 const data = response.data;
                 if (data) {
                     navigate('/post', {
@@ -93,6 +109,7 @@ const PostEditModal = ({ show, handleClose, postDetails, viewMode }) => {
     }
 
     useEffect(() => {
+        console.log(viewMode, createMode);
         if (postDetails) {
             setTitle(postDetails.title);
             setDescription(postDetails.description);
@@ -107,7 +124,7 @@ const PostEditModal = ({ show, handleClose, postDetails, viewMode }) => {
                 <div className="modal-dialog">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title" id="staticBackdropLabel">{viewMode ?'View' :'Edit'} Post</h5>
+                            <h5 className="modal-title" id="staticBackdropLabel">{createMode ? 'Create' : (viewMode ? 'View' : 'Edit')} Post</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={handleClose}></button>
                         </div>
                         <div className="modal-body">
@@ -141,7 +158,7 @@ const PostEditModal = ({ show, handleClose, postDetails, viewMode }) => {
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={handleClose}>Close</button>
-                            {!viewMode && <button type="button" className="btn btn-primary" onClick={handleUpdatePost}>Update</button>}
+                            {!viewMode && <button type="button" className="btn btn-primary" onClick={handleUpdatePost}>{createMode ? 'Create' : 'Update'}</button>}
                         </div>
                     </div>
                 </div>
@@ -151,4 +168,4 @@ const PostEditModal = ({ show, handleClose, postDetails, viewMode }) => {
     )
 }
 
-export default PostEditModal;
+export default PostModal;

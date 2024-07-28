@@ -6,31 +6,40 @@ body {
 
 .app-container {
   display: flex;
-  height: 100vh; /* Full viewport height */
+  height: 80vh;
+  /* Full viewport height */
 }
 
 .sidebar {
   width: 200px;
-  height: 100vh; /* Full viewport height */
+  height: 100vh;
+  /* Full viewport height */
   position: fixed;
   top: 0;
   left: 0;
-  background-color: #f8f9fa; /* Adjust according to your design */
-  z-index: 100; /* Ensure it stays below the navbar */
+  background-color: #f8f9fa;
+  /* Adjust according to your design */
+  z-index: 100;
+  /* Ensure it stays below the navbar */
 }
 
 .content-area {
-  margin-left: 200px; /* Same width as the sidebar */
-  width: calc(100% - 200px); /* Full width minus the sidebar width */
+  margin-left: 200px;
+  /* Same width as the sidebar */
+  width: calc(100% - 200px);
+  /* Full width minus the sidebar width */
   display: flex;
   flex-direction: column;
 }
 
 .main-content {
   flex-grow: 1;
-  padding: 16px; /* Adjust based on your needs */
-  overflow-y: auto;
-  background-color: #e9ecef; /* Adjust according to your design */
+  padding: 16px;
+  /* Adjust based on your needs */
+  /* overflow-y: auto; */
+  background-color: #e9ecef;
+  padding-bottom: 60px; /* Make room for the footer */
+  /* Adjust according to your design */
 }
 
 .bg-white {
@@ -49,9 +58,24 @@ body {
 }
 
 /* Adjust padding inside the container */
+.container {
+  margin-top: 0 !important;
+}
+
 .container.py-3.px-0 {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 4;
+  background-color: #fff;
+  border-top: 1px solid #dee2e6;
+  color: #869099;
+  padding: 1rem;
 }
 
 
@@ -61,13 +85,70 @@ body {
   --tw-bg-opacity: 1;
   background-color: rgb(56 68 85 / var(--tw-bg-opacity));
   border-radius: 15px;
+  padding: 15px;
 }
 
 .sidebar .nav-link.bg-activeLinkBg.text-activeLinkText {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
+
 .sidebar .nav-link {
   color: #000;
   transition: background-color 0.3s ease;
+  padding: 15px;
+  margin: 2px;
+}
+
+/* Table Style */
+.table {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.table-bordered>:not(caption)>*>* {
+  border-width: 0 !important;
+}
+
+.table th,
+.table td {
+  padding: 1rem;
+  vertical-align: middle;
+  border-bottom: 2px solid #007bff;
+  /* Change to your desired border color */
+}
+
+.table thead tr.th {
+  background-color: #f8f9fa;
+  padding: 1.5rem 1rem;
+  /* Increase padding for th elements */
+}
+
+.table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+.table img.rounded-circle {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+}
+
+.table .badge {
+  padding: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.form-switch .form-check-input {
+  width: 2rem;
+  height: 1rem;
+  background-size: 50%;
+}
+
+.shadow-sm {
+  box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important;
+}
+
+.table tr {
+  border-bottom: 1px solid #ece8e8;
 }
