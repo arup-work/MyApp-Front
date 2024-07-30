@@ -58,6 +58,11 @@ const CommentList = ({ comments }) => {
     }, [comments]);
     return (
         <div>
+            {comments.length == 0 && (
+                <div>
+                    No comment found
+                </div>
+            )}
             {comments.map((comment, index) => (
                 <div key={comment._id}>
                     <p>{comment.comment}</p>
@@ -75,7 +80,7 @@ const CommentList = ({ comments }) => {
                             </small>
                         </div>
                     </div>
-                    <div className="d-flex justify-content-end">
+                    <div className="d-flex justify-content-end mb-2">
                         <div>
                             <small className="text-primary">{comment.userName}</small>
                         </div>

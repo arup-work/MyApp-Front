@@ -22,10 +22,10 @@ const Index = () => {
     const [posts, setPosts] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPage, setTotalPage] = useState(1);
-    const [postsPerPage] = useState(5);
+    const [postsPerPage, setPostPerPage] = useState(5);
     const [message, setMessage] = useState('');
     const [searchedPost, setSearchPost] = useState('');
-    const [selectedLimit, setSelectedLimit] = useState(10);
+    const [selectedLimit, setSelectedLimit] = useState(5);
 
     const [showEditModal, setShowEditModal] = useState(false);
     const [postDetails, setPostDetails] = useState([]);
@@ -98,6 +98,7 @@ const Index = () => {
     }
     // Fetch posts 
     const fetchPosts = async (searchKey = '') => {
+        console.log(postsPerPage);
         const response = await PostService.index(auth, currentPage, postsPerPage, searchKey);
         if (response.data) {
             const data = response.data;
@@ -111,6 +112,7 @@ const Index = () => {
         setShowEditModal(false);
     }
 
+    // For searching
     const handleInputChange = (value) => {
         setSearchPost(value);
         handleSearch(value);
@@ -124,10 +126,12 @@ const Index = () => {
         handleSearch('');
     }
 
+    // Limit change dropdown functionality
     const handleLimitChange = (event) => {
        const selectedValue = event.target.value;
        setSelectedLimit(selectedValue);
-       console.log(selectedLimit);
+       setPostPerPage(selectedValue);
+       fetchPosts();
     }
 
     useEffect(() => {
@@ -156,6 +160,7 @@ const Index = () => {
                             <div className="d-flex align-items-center">
                                 <span className="me-2">Show</span>
                                 <select className="form-select" aria-label="Entries select" onChange={handleLimitChange} value={selectedLimit}>
+                                    <option value="5">5</option>
                                     <option value="10">10</option>
                                     <option value="25">25</option>
                                     <option value="50">50</option>
@@ -216,12 +221,12 @@ const Index = () => {
                                                 <button className="btn btn-sm btn-primary me-2" onClick={() => edit(post._id)}>
                                                     <FontAwesomeIcon icon={faEdit} />
                                                 </button>
-                                                <button className="btn btn-sm btn-danger ml-2" onClick={() => deletePost(post._id)}>
+                                                <button className="btn btn-sm btn-danger me-2" onClick={() => deletePost(post._id)}>
                                                     <FontAwesomeIcon icon={faTrashAlt} />
                                                 </button>
                                             </>
                                         ) : null}
-                                        <button className="btn btn-sm btn-primary mx-2" onClick={() => edit(post._id, true)}>
+                                        <button className="btn btn-sm btn-primary" onClick={() => edit(post._id, true)}>
                                             <FontAwesomeIcon icon={faEye} />
                                         </button>
                                     </td>

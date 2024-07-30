@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -29,6 +29,7 @@ const Details = () => {
     const [totalComment, setTotalComment] = useState(0);
     const [postsPerPage] = useState(5);
     const [searchKey, setSearchKey] = useState('');
+    const [searchedComment, setSearchComment] = useState('');
 
     // const { auth } = useContext(AuthContext);
     const { auth } = useSelector(state => state.auth);
@@ -99,8 +100,18 @@ const Details = () => {
         }
     }
 
+    // For searching
+       const handleInputChange = (value) => {
+        setSearchComment(value);
+        handleSearch(value);
+    }
     const handleSearch = (searchKey) => {
         fetchPostWithComments(searchKey);
+    }
+
+    const clearSearch = () => {
+        setSearchComment('');
+        handleSearch('');
     }
 
     useEffect(() => {
@@ -114,10 +125,23 @@ const Details = () => {
     }, [comments])
 
     return (
-        <div className="container">
+        <div>
             <ToastContainer />
-            <div className="row justify-content-center mt-5">
-                <div className="col-8">
+            <div className="row justify-content-start ms-4">
+                <div className="col-9">
+                <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb">
+                                <li className="breadcrumb-item">
+                                    <Link as={Link} to="/post" className="text-decoration-none">Posts</Link>
+                                </li>
+                                <li className="breadcrumb-item active" aria-current="page">{post.title}</li>
+                            </ol>
+                        </nav>
+                </div>
+                </div>
+               
+            <div className="row justify-content-start mt-2 ms-4">
+                <div className="col-9">
                     <div className="card post">
                         <div className="card-body">
                             <h1 className="post-title">{post.title} </h1>
@@ -166,9 +190,24 @@ const Details = () => {
                                         <div className="col-8">
                                             <h4 className="comments-count mb-4">{totalComment} Comments</h4>
                                         </div>
-                                        <div className="col-4">
+                                        <div className="col-4 head_search">
 
-                                            <input type="text" className="form-control" onChange={e => handleSearch(e.target.value)}/>
+                                            <div className="position-relative">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Search..."
+                                                    value={searchedComment}
+                                                    onChange={e => handleInputChange(e.target.value)}
+                                                    className="head_search bg-sidebar_bg text-textColorBlack bg-gray-50 border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 p-2 me-2"
+                                                />
+                                                {searchedComment !== '' &&
+                                                    <>
+                                                        <button className="position-absolute top-50 end-0 translate-middle-y me-2 border-0 bg-transparent" onClick={clearSearch} style={{ outline: 'none' }}>
+                                                            <img src="/assets/images/dark_cross.svg" alt="Clear" className="right-2.5 bottom-2.5 " />
+                                                        </button>
+                                                    </>
+                                                }
+                                            </div>
                                         </div>
                                     </div>
 
