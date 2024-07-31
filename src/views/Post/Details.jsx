@@ -4,6 +4,9 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar } from '@fortawesome/free-solid-svg-icons';
+
 import PostService from "../../services/PostService";
 import { AuthContext } from "../../contexts/AuthContext";
 import '../../assets/styles/PostPage.css';
@@ -144,7 +147,7 @@ const Details = () => {
                 <div className="col-9">
                     <div className="card post">
                         <div className="card-body">
-                            <h1 className="post-title">{post.title} </h1>
+                            <h1 className="post-title"> <img src="/assets/images/black_star.svg" alt="" /> {post.title}</h1>
                             <div className="row mt-3">
                                 <div className="col-12">
                                     <div className="row">
