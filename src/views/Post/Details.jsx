@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -7,8 +7,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 
+import { addFavoritePost, removeFavoritePost } from "../../redux/thunks/favoriteThunks";
 import PostService from "../../services/PostService";
-import { AuthContext } from "../../contexts/AuthContext";
 import '../../assets/styles/PostPage.css';
 import DateFormatter from "../../components/DateFormatter";
 import CommentList from "../../components/Post/CommentList";
@@ -17,6 +17,8 @@ import Pagination from "../../components/Pagination";
 
 
 const Details = () => {
+    const dispatch = useDispatch();
+
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -31,11 +33,13 @@ const Details = () => {
     const [totalPage, setTotalPage] = useState(1);
     const [totalComment, setTotalComment] = useState(0);
     const [postsPerPage] = useState(5);
-    const [searchKey, setSearchKey] = useState('');
     const [searchedComment, setSearchComment] = useState('');
 
     // const { auth } = useContext(AuthContext);
     const { auth } = useSelector(state => state.auth);
+
+    const favoritePosts = useSelector((state) => state.favorites.favoritePosts) || [];
+    const isFavorite = favoritePosts.some((favPost) => favPost === post._id);
 
     const fetchPostWithComments = async (searchKey = '') => {
         const response = await PostService.fetchPostWithComments(auth, postId, currentPage, postsPerPage, searchKey);
@@ -104,7 +108,7 @@ const Details = () => {
     }
 
     // For searching
-       const handleInputChange = (value) => {
+    const handleInputChange = (value) => {
         setSearchComment(value);
         handleSearch(value);
     }
@@ -115,6 +119,16 @@ const Details = () => {
     const clearSearch = () => {
         setSearchComment('');
         handleSearch('');
+    }
+
+    // Handle favorite post
+    const handleFavoritePost = async() => {
+        // const response = await UserService.addFavoritePost(auth, postId);
+        if (!isFavorite) {
+            dispatch(addFavoritePost({auth, postId}));
+        }else{
+            dispatch(removeFavoritePost({auth, postId}))
+        }
     }
 
     useEffect(() => {
@@ -132,22 +146,25 @@ const Details = () => {
             <ToastContainer />
             <div className="row justify-content-start ms-4">
                 <div className="col-9">
-                <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb">
-                                <li className="breadcrumb-item">
-                                    <Link as={Link} to="/post" className="text-decoration-none">Posts</Link>
-                                </li>
-                                <li className="breadcrumb-item active" aria-current="page">{post.title}</li>
-                            </ol>
-                        </nav>
+                    <nav aria-label="breadcrumb">
+                        <ol className="breadcrumb">
+                            <li className="breadcrumb-item">
+                                <Link as={Link} to="/post" className="text-decoration-none">Posts</Link>
+                            </li>
+                            <li className="breadcrumb-item active" aria-current="page">{post.title}</li>
+                        </ol>
+                    </nav>
                 </div>
-                </div>
-               
+            </div>
+
             <div className="row justify-content-start mt-2 ms-4">
                 <div className="col-9">
                     <div className="card post">
                         <div className="card-body">
-                            <h1 className="post-title"> <img src="/assets/images/black_star.svg" alt="" /> {post.title}</h1>
+                            <h1 className="post-title">
+                                <span>{ isFavorite ? <img src="/assets/images/star.svg" alt="" onClick={handleFavoritePost} className="favorite-img"/> : <img src="/assets/images/black_star.svg" alt="" onClick={handleFavoritePost} className="favorite-img"/>}</span>
+                                <span>{post.title}</span>
+                            </h1>
                             <div className="row mt-3">
                                 <div className="col-12">
                                     <div className="row">

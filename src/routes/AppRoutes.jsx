@@ -63,6 +63,10 @@ const AppRoutes = () => {
                 element={isAuthenticated ? <PostIndex /> : <Navigate to="/login" />}
             />
             <Route 
+                path="/favorites"
+                element={isAuthenticated ? <PostIndex /> : <Navigate to="/login" />}
+            />
+            <Route 
                 path="/post/:postId"
                 element={isAuthenticated ? <PostDetails /> : <Navigate to="/login" />}
             />

@@ -5,12 +5,13 @@ import { Link, useLocation } from 'react-router-dom';
 
 import { Nav } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faComments, faGaugeHigh } from '@fortawesome/free-solid-svg-icons';
+import { faComments, faGaugeHigh, faStar } from '@fortawesome/free-solid-svg-icons';
 import reactLogo from '../../assets/react.svg'
 
 const Sidebar = () => {
     const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
     const auth = useSelector(state => state.auth.auth);
+    const favoritePost = useSelector(state => state.favorites.favoritePosts);
     const location = useLocation();
 
     const getNavLinkClass = (path) => {
@@ -35,6 +36,12 @@ const Sidebar = () => {
                 <Nav.Link as={Link} to="/" className={getNavLinkClass('/')}>
                     <FontAwesomeIcon icon={faGaugeHigh} />
                     <span className='ms-2'>Dashboard</span>
+                </Nav.Link>
+                <Nav.Link as={Link} to="/favorites" className={getNavLinkClass('/favorites')}>
+                    <FontAwesomeIcon icon={faStar} />
+                    <span className='ms-2 me-2'>Favorites
+                        <span class="sidebar-badge ms-1">{favoritePost.length}</span>
+                    </span>
                 </Nav.Link>
                 <Nav.Link as={Link} to="/post" className={getNavLinkClass('/post')}>
                     <FontAwesomeIcon icon={faComments} />

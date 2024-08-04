@@ -137,4 +137,23 @@ export default class PostService {
             return { data: null, error: errorMessage };
         }
     }
+
+    static async fetchFavoritePost(auth, currentPage, postsPerPage, searchKey) {
+        try {
+            const bearerToken = { 'Authorization': `Bearer ${auth.token}` };
+            const response = await apiRequest(`user/${auth.user.id}/favorites/?page=${currentPage}&limit=${postsPerPage}&search=${searchKey}`,'GET',null, bearerToken);
+            if (response.ok) {
+                const data = response.data;
+                return { data, error: null};
+            } else {
+                const errorMessage = response.message || 'An error occurred while adding favorite post.';
+                showErrorToast(errorMessage);
+                return { data: null, error: errorMessage };
+            }
+        } catch (error) {
+            const errorMessage = error.message || 'An error occurred while adding favorite post.';
+            showErrorToast(errorMessage);
+            return { data: null, error: errorMessage };
+        }
+    }
 }

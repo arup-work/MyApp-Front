@@ -130,3 +130,22 @@
     border-radius: 15px;
 }
 
+.favorite-img{
+    margin-bottom: 7px;
+    padding: 5px;
+}
+
+.sidebar-badge{
+    display: inline-block;
+    color: #fff;
+    background-color: #dc3545;
+    padding: .25em .4em;
+    font-size: 90%;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25rem;
+}
+

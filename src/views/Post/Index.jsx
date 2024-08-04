@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -13,24 +13,31 @@ import AuthService from "../../services/AuthService";
 import PostService from "../../services/PostService";
 import { showConfirmationModal, showSuccessModal } from "../../helpers/utils/sweetAlertUtils";
 import { AuthContext } from "../../contexts/AuthContext";
+
+import { fetchFavoritePost } from "../../redux/thunks/favoriteThunks";
 import '../../assets/styles/PostPage.css';
 
 
 const Index = () => {
+    const dispatch = useDispatch();
     const location = useLocation();
     const navigate = useNavigate();
+
     const [posts, setPosts] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPage, setTotalPage] = useState(1);
     const [postsPerPage, setPostPerPage] = useState(5);
     const [message, setMessage] = useState('');
     const [searchedPost, setSearchPost] = useState('');
+    const [favoriteSearchedPost, setFavoriteSearchedPost] = useState('');
     const [selectedLimit, setSelectedLimit] = useState(5);
+    const [favoriteSelectedLimit, setFavoriteSelectedLimit] = useState(5);
 
     const [showEditModal, setShowEditModal] = useState(false);
     const [postDetails, setPostDetails] = useState([]);
     const [viewMode, setViewMode] = useState(false);
     const [createMode, setCreateMode] = useState(false);
+    const [isFavoriteView, setIsFavoriteView] = useState(false);
 
     // const { auth } = useContext(AuthContext);
     const { auth } = useSelector(state => state.auth);
@@ -98,14 +105,27 @@ const Index = () => {
     }
     // Fetch posts 
     const fetchPosts = async (searchKey = '') => {
-        console.log(postsPerPage);
-        const response = await PostService.index(auth, currentPage, postsPerPage, searchKey);
-        if (response.data) {
-            const data = response.data;
-            setPosts(data.posts.post || []);
-            setTotalPage(data.posts.totalPage);
-            setMessage(data.posts.message);
+        if (location.pathname === '/favorites') {
+            const response = await PostService.fetchFavoritePost(auth, currentPage, postsPerPage, searchKey);
+            console.log(response.data);
+            setIsFavoriteView(true);
+            if (response.data) {
+                const data = response.data;
+                setPosts(data.favoritePosts.favoritePosts || []);
+                setTotalPage(data.favoritePosts.totalPage);
+                setMessage(data.favoritePosts.message);
+            }
+        } else {
+            const response = await PostService.index(auth, currentPage, postsPerPage, searchKey);
+            setIsFavoriteView(false);
+            if (response.data) {
+                const data = response.data;
+                setPosts(data.posts.post || []);
+                setTotalPage(data.posts.totalPage);
+                setMessage(data.posts.message);
+            }
         }
+
     }
 
     const handleClose = () => {
@@ -114,7 +134,11 @@ const Index = () => {
 
     // For searching
     const handleInputChange = (value) => {
-        setSearchPost(value);
+        if (isFavoriteView) {
+            setFavoriteSearchedPost(value);
+        }else{
+            setSearchPost(value);
+        }
         handleSearch(value);
     }
     const handleSearch = (searchKey) => {
@@ -122,16 +146,24 @@ const Index = () => {
     }
 
     const clearSearch = () => {
-        setSearchPost('');
+        if (isFavoriteView) {
+            setFavoriteSearchedPost('');
+        }else{
+            setSearchPost('');
+        }
         handleSearch('');
     }
 
     // Limit change dropdown functionality
     const handleLimitChange = (event) => {
-       const selectedValue = event.target.value;
-       setSelectedLimit(selectedValue);
-       setPostPerPage(selectedValue);
-       fetchPosts();
+        const selectedValue = event.target.value;
+        if (isFavoriteView) {
+            setFavoriteSelectedLimit(selectedValue);
+        }else{
+            setSelectedLimit(selectedValue);
+        }
+        setPostPerPage(selectedValue);
+        fetchPosts();
     }
 
     useEffect(() => {
@@ -147,7 +179,7 @@ const Index = () => {
             <ToastContainer />
             <div className="row mb-3">
                 <div className="col-6">
-                    <h3>Posts</h3>
+                    <h3>{ isFavoriteView ? 'Favorites' : 'Posts'}</h3>
                 </div>
                 <div className="col-6 d-flex justify-content-end post-create">
                     <a className="btn btn-sm btn-primary btn-round btn-icon" onClick={() => edit(null, null, true)}> <FontAwesomeIcon icon={faPlus} /><span className="ms-2">Create</span></a>
@@ -159,7 +191,7 @@ const Index = () => {
                         <div className="col-3">
                             <div className="d-flex align-items-center">
                                 <span className="me-2">Show</span>
-                                <select className="form-select" aria-label="Entries select" onChange={handleLimitChange} value={selectedLimit}>
+                                <select className="form-select" aria-label="Entries select" onChange={handleLimitChange} value={isFavoriteView ? favoriteSelectedLimit : selectedLimit}>
                                     <option value="5">5</option>
                                     <option value="10">10</option>
                                     <option value="25">25</option>
@@ -176,11 +208,11 @@ const Index = () => {
                         <input
                             type="text"
                             placeholder="Search..."
-                            value={searchedPost}
+                            value={isFavoriteView ? favoriteSearchedPost : searchedPost}
                             onChange={e => handleInputChange(e.target.value)}
                             className="head_search bg-sidebar_bg text-textColorBlack bg-gray-50 border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 p-2 me-2"
                         />
-                        {searchedPost !== '' &&
+                        {(isFavoriteView ? favoriteSearchedPost : searchedPost) !== '' &&
                             <>
                                 <button className="position-absolute top-50 end-0 translate-middle-y me-2 border-0 bg-transparent" onClick={clearSearch} style={{ outline: 'none' }}>
                                     <img src="/assets/images/dark_cross.svg" alt="Clear" className="right-2.5 bottom-2.5 " />
