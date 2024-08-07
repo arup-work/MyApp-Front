@@ -1,4 +1,3 @@
-import React from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -9,8 +8,6 @@ import { faComments, faGaugeHigh, faStar } from '@fortawesome/free-solid-svg-ico
 import reactLogo from '../../assets/react.svg'
 
 const Sidebar = () => {
-    const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
-    const auth = useSelector(state => state.auth.auth);
     const favoritePost = useSelector(state => state.favorites.favoritePosts);
     const location = useLocation();
 
@@ -40,7 +37,7 @@ const Sidebar = () => {
                 <Nav.Link as={Link} to="/favorites" className={getNavLinkClass('/favorites')}>
                     <FontAwesomeIcon icon={faStar} />
                     <span className='ms-2 me-2'>Favorites
-                        <span class="sidebar-badge ms-1">{favoritePost.length}</span>
+                        <span className="sidebar-badge ms-1">{favoritePost.length}</span>
                     </span>
                 </Nav.Link>
                 <Nav.Link as={Link} to="/post" className={getNavLinkClass('/post')}>

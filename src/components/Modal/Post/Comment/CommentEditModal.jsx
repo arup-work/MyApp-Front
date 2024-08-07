@@ -4,7 +4,7 @@ import { AuthContext } from "../../../../contexts/AuthContext";
 import CommentService from "../../../../services/CommentService";
 import { useSelector } from "react-redux";
 
-const CommentEditModal = ({ show, handleClose, commentDetails }) => {
+const CommentEditModal = ({ show, handleClose, commentDetails, replyMode }) => {
     const [comment, setComment] = useState('');
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
@@ -27,7 +27,7 @@ const CommentEditModal = ({ show, handleClose, commentDetails }) => {
         return !Object.keys(newErrors).length;
     }
 
-    // Handle the form
+    // Handle comment form
     const handleUpdateComment = async (e) => {
         e.preventDefault();
         const postId = commentDetails.postId;
@@ -49,9 +49,31 @@ const CommentEditModal = ({ show, handleClose, commentDetails }) => {
             }
         }
     }
+    // Handle reply comment
+    const handleReplyComment = async (e) => {
+        e.preventDefault();
+        const postId = commentDetails.postId;
+        if (validateForm()) {
+            try {
+                const response = await CommentService.store(auth, postId, { comment, parentCommentId: commentDetails._id });
+                const data = response.data;
+                if (data) {
+                    navigate(`/post/${postId}`, {
+                        // state: {
+                        //     message: data.message, type: 'success'
+                        // }
+                    });
+                    handleClose();
+                    setComment('');
+                }
+            } catch (error) {
+                setErrors('An error occurred. Please try again later.');
+            }
+        }
+    }
 
     useEffect(() => {
-        if (commentDetails) {
+        if (commentDetails && !replyMode) {
             setComment(commentDetails.comment);
         }
     }, [commentDetails]);
@@ -61,14 +83,14 @@ const CommentEditModal = ({ show, handleClose, commentDetails }) => {
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title" id="exampleModalLabel">Edit Comment</h5>
+                            <h5 className="modal-title" id="exampleModalLabel">{replyMode ? 'Reply ' : 'Edit Comment'}</h5>
                             <button type="button" className="btn-close" aria-label="Close" onClick={handleClose}></button>
                         </div>
                         <div className="modal-body">
                             <form>
                                 {/* Example input fields */}
                                 <div className="form-group">
-                                    <label htmlFor="commentText">Comment</label>
+                                    {!replyMode && <label htmlFor="commentText">Comment</label>}
                                     <textarea
                                         className="form-control"
                                         id="commentText"
@@ -84,7 +106,10 @@ const CommentEditModal = ({ show, handleClose, commentDetails }) => {
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
-                            <button type="button" className="btn btn-primary" onClick={handleUpdateComment}>Update</button>
+                            {replyMode ? <>
+                                <button type="button" className="btn btn-primary" onClick={handleReplyComment}>Save</button>
+                            </> : <button type="button" className="btn btn-primary" onClick={handleUpdateComment}>Update</button>}
+
                         </div>
                     </div>
                 </div>

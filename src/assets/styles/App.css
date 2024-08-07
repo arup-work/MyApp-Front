@@ -6,7 +6,7 @@ body {
 
 .app-container {
   display: flex;
-  height: 80vh;
+  height: 100vh;
   /* Full viewport height */
 }
 
@@ -36,9 +36,9 @@ body {
   flex-grow: 1;
   padding: 16px;
   /* Adjust based on your needs */
-  /* overflow-y: auto; */
+  overflow-y: auto;
   background-color: #e9ecef;
-  padding-bottom: 60px; /* Make room for the footer */
+  padding-bottom: 50px; /* Make room for the footer */
   /* Adjust according to your design */
 }
 

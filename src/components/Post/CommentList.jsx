@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faEdit, faTrashAlt, faEye } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faEdit, faTrashAlt, faReply, faCommentDots } from '@fortawesome/free-solid-svg-icons';
 import DateFormatter from "../DateFormatter";
 import CommentEditModal from "../Modal/Post/Comment/CommentEditModal";
 import CommentService from "../../services/CommentService";
@@ -13,19 +13,20 @@ const CommentList = ({ comments }) => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const [comment, setComment] = useState('');
     const [showEditModal, setShowEditModal] = useState(false);
     const [commentDetails, setCommentDetails] = useState([]);
+    const [replyMode, setReplyMode] = useState(false);
 
 
     const { auth } = useSelector(state => state.auth);
 
-    const edit = async (commentId) => {
+    const edit = async (commentId, isReplyModeEnable = false) => {
         const response = await CommentService.fetchComment(auth, commentId);
         const comment = response.data.comment;
         if (comment) {
             setCommentDetails(comment);
         }
+        setReplyMode(isReplyModeEnable);
         setShowEditModal(true);
     }
 
@@ -64,31 +65,40 @@ const CommentList = ({ comments }) => {
                 </div>
             )}
             {comments.map((comment, index) => (
-                <div key={comment._id}>
-                    <p>{comment.comment}</p>
-                    { auth.user.id == comment.userId._id && (
-                         <div className="d-flex justify-content-end mx-2">
-                         <FontAwesomeIcon icon={faEdit} onClick={(e) => edit(comment._id)} role="button"/>
-                         <FontAwesomeIcon icon={faTrashAlt} className="ms-2" onClick={(e) => deleteComment(comment._id, comment.postId)} role="button"/>
-                     </div>
-                    )}
-                   
-                    <div className="d-flex justify-content-end">
-                        <div>
-                            <small>
-                                <DateFormatter date={comment.createdAt} withMinutes={true} />
-                            </small>
+                <div key={comment._id} className="comment">
+                    <div className="comment-body">
+                        <p>{comment.comment}</p>
+                        <FontAwesomeIcon icon={faReply} onClick={(e) => edit(comment._id, true)} role="button" />
+                        {auth.user.id == comment.userId._id && (
+                            <div className="d-flex justify-content-end mx-2">
+                                <FontAwesomeIcon icon={faEdit} onClick={(e) => edit(comment._id)} role="button" />
+                                <FontAwesomeIcon icon={faTrashAlt} className="ms-2" onClick={(e) => deleteComment(comment._id, comment.postId)} role="button" />
+                            </div>
+                        )}
+
+                        <div className="d-flex justify-content-end">
+                            <div>
+                                <small>
+                                    <DateFormatter date={comment.createdAt} withMinutes={true} />
+                                </small>
+                            </div>
+                        </div>
+                        <div className="d-flex justify-content-end mb-2">
+                            <div>
+                                <small className="text-primary">{comment.userName}</small>
+                            </div>
                         </div>
                     </div>
-                    <div className="d-flex justify-content-end mb-2">
-                        <div>
-                            <small className="text-primary">{comment.userName}</small>
-                        </div>
+                    <div className="comment-children">
+                        {comment.children && comment.children.length > 0 && (
+                            <CommentList comments={comment.children} />
+                        )}
                     </div>
+
                     {comments.length !== index + 1 && <hr />}
                 </div>
             ))}
-            {showEditModal && <CommentEditModal show={showEditModal} handleClose={handleClose} commentDetails={commentDetails} />}
+            {showEditModal && <CommentEditModal show={showEditModal} handleClose={handleClose} commentDetails={commentDetails} replyMode={replyMode} />}
         </div>
     )
 };
