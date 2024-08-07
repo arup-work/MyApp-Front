@@ -36,7 +36,7 @@ function App() {
             <AppRoutes />
           </div>
         )}
-        <Footer />
+        {/* <Footer /> */}
       </div>
     </Router >
   )

@@ -149,18 +149,49 @@
     border-radius: .25rem;
 }
 
-.comment {
-    margin-bottom: 1em;
-    padding-left: 1em;
-    border-left: 2px solid #ddd;
+.author-thumbnail{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    text-align: center;
 }
 
-.comment-body {
-    margin-bottom: 0.5em;
+.comment-box {
+    display: flex;
+    margin-bottom: 15px;
+}
+.comment-avatar {
+    margin-right: 10px;
 }
 
-.comment-children {
-    margin-left: 1em;
+.comment-avatar img{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    text-align: center;
+}
+.comment-content {
+    flex: 1;
+}
+.comment-actions {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+.comment-actions button {
+    margin-right: 10px;
+}
+
+.comment-actions button .fa-icon {
+    background-color: white; /* Set icon color */
 }
 
 

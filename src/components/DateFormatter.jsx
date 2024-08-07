@@ -36,7 +36,7 @@ const formatTimeDifference = ({ years, months, days, isToday, diffInSeconds, dif
         }else if (diffInMinutes < 60) {
             return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
         }else{
-            return `${diffInHours} hour${diffInHours > 1 ? 's' : ''}`;
+            return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
         }
     }
 
