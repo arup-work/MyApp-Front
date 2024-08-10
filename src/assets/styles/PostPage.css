@@ -194,4 +194,19 @@
     background-color: white; /* Set icon color */
 }
 
+.comment-replies span{
+    color: #065fd4;
+    padding: 10px 18px 10px 0;
+    font-size: 16px;
+    font-weight: 500;
+}
+.comment-replies span:hover{
+    cursor: pointer;
+    padding: 10px 18px 10px 0;
+    background-color: #475c783d;
+    border-radius: 1.25rem;
+    font-size: 16px;
+    font-weight: 500;
+}
+
 

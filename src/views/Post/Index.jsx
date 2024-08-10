@@ -107,7 +107,6 @@ const Index = () => {
     const fetchPosts = async (searchKey = '') => {
         if (location.pathname === '/favorites') {
             const response = await PostService.fetchFavoritePost(auth, currentPage, postsPerPage, searchKey);
-            console.log(response.data);
             setIsFavoriteView(true);
             if (response.data) {
                 const data = response.data;
