@@ -3,6 +3,7 @@ import { showErrorToast, showSuccessToast } from "../helpers/utils/toastUtils";
 
 export default class CommentService {
     static async store(auth, postId, data) {
+        console.log(data);
         try {
             const bearerToken = { 'Authorization': `Bearer ${auth.token}` };
             const response = await apiRequest(`comment/${postId}`,'POST',data, bearerToken);

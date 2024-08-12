@@ -5,21 +5,45 @@ import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 
 import DateFormatter from "../DateFormatter";
 import CommentService from "../../services/CommentService";
+import ReplyComment from "./ReplyComment";
 
 
 const Comment = ({ comment }) => {
+    console.log(comment);
     const [replies, setReplies] = useState([]);
-    const [childReplies, setChildReplies] = useState([]);
-    const [replyExpend, setRelyExpend] = useState(false);
+    const [expandedReplies, setExpendedReplies] = useState(false);
+    const [expandedNestedReplies, setExpendedNestedReplies] = useState(false);
+
+    const [activeCommentId, setActiveCommentId] = useState(null);
+
     const { auth } = useSelector(state => state.auth);
 
     // Handle replies
-    const handleReplies = async (commentId) => {
-        setRelyExpend(prevState => !prevState);
-        const response = await CommentService.fetchComment(auth, commentId);
-        const { children } = response.data.comment;
-        setChildReplies(children);
-        setReplies(children);
+    const handleReplies = async (commentId, isNested = false) => {
+        if (isNested) {
+            setExpendedNestedReplies(prevState => !prevState);
+        } else {
+            setExpendedReplies(prevState => !prevState);
+        }
+
+        if (!expandedReplies) {
+            const response = await CommentService.fetchComment(auth, commentId);
+            if (response.data.comment.children) {
+                const { children } = response.data.comment;
+                setReplies(children);
+            }
+        }
+    }
+
+    // Handle reply click
+    const handleReplyClick = (commentId) => {
+        // Toggle the reply box for the specific comment
+        setActiveCommentId(activeCommentId === commentId ? null : commentId)
+    }
+
+    const handleClose = (commentId) => {
+        setActiveCommentId(commentId);
+        // handleReplies(commentId,true);
     }
     return (
         <div style={{ marginLeft: comment.parentCommentId ? '20px' : '0px' }}>
@@ -36,8 +60,12 @@ const Comment = ({ comment }) => {
                     </div>
                     <div className="comment-actions">
                         <img src="/assets/images/like.svg" alt="like" />
-                        <button className="btn btn-outline-secondary btn-sm ms-2" onClick={(e) => edit(comment._id, true)} role="button">Reply</button>
+                        <button className="btn btn-outline-secondary btn-sm ms-2" onClick={() => handleReplyClick(comment._id)} role="button">Reply</button>
                     </div>
+
+                    {comment._id === activeCommentId && (
+                        <ReplyComment comment={comment} onCancel={() => handleClose()} />
+                    )}
                     {comment.childrenCount > 0 && <>
                         <div className="comment-replies mt-3">
                             <span onClick={() => handleReplies(comment._id)}>
@@ -46,19 +74,28 @@ const Comment = ({ comment }) => {
                             </span>
                         </div>
                     </>}
-                    {replyExpend && <div className="expender-contents mt-3">
-                        {replies.map(reply => (
-                            <Comment key={reply._id} comment={reply} />
-                        ))}
-                    </div>}
-                    {/* {childReplies.length > 0 && <>
-                        <div className="comment-replies mt-3 m-5">
+                    {comment.children && comment.children.length > 0 && <>
+                        <div className="comment-replies mt-3">
                             <span onClick={() => handleReplies(comment._id)}>
                                 <FontAwesomeIcon icon={faChevronDown} role="button" className="ms-2 me-2" />
-                                {comment.childrenCount} {comment.childrenCount == 1 ? 'reply' : 'replies'}
+                                {comment.children.length} {comment.children.length == 1 ? 'reply' : 'replies'}
                             </span>
                         </div>
-                    </>} */}
+                    </>}
+                    {expandedNestedReplies && comment.children && comment.children.length > 0 && (
+                        <div className="expender-contents mt-3">
+                            {comment.children.map(child => (
+                                <Comment key={child._id} comment={child} />
+                            ))}
+                        </div>
+                    )}
+                    {expandedReplies && (
+                        <div className="expender-contents mt-3">
+                            {replies.map(reply => (
+                                <Comment key={reply._id} comment={reply} />
+                            ))}
+                        </div>
+                    )}
 
                 </div>
 
