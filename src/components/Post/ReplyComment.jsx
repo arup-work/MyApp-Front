@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import CommentService from "../../services/CommentService";
 
-const ReplyComment = ({ comment, onCancel }) => {
+const ReplyComment = ({ comment, onCancel, onAddReply }) => {
     const [replyText, setReplyText] = useState('');
     const [errors, setErrors] = useState({});
 
@@ -29,13 +29,14 @@ const ReplyComment = ({ comment, onCancel }) => {
     }
 
     // Handle reply comment
-    const handleReplyComment = async (e) => {
+    const handleReplySubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
             try {
                 const response = await CommentService.store(auth, comment.postId, { comment: replyText, parentCommentId: comment._id });
                 const data = response.data;
-                console.log(response);
+                // Pass the new reply data to the parent component
+                onAddReply(data.comment);
                 if (data) {
                     onCancel();
                     setReplyText('');
@@ -57,7 +58,7 @@ const ReplyComment = ({ comment, onCancel }) => {
                     <button className="btn btn-light cancel-btn" onClick={handleClearReply}>
                         Cancel
                     </button>
-                    <button className="btn btn-primary reply-btn" onClick={handleReplyComment}>
+                    <button className="btn btn-primary reply-btn" onClick={handleReplySubmit}>
                         Reply
                     </button>
                 </div>

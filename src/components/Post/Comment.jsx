@@ -9,10 +9,10 @@ import ReplyComment from "./ReplyComment";
 
 
 const Comment = ({ comment }) => {
-    console.log(comment);
     const [replies, setReplies] = useState([]);
     const [expandedReplies, setExpendedReplies] = useState(false);
     const [expandedNestedReplies, setExpendedNestedReplies] = useState(false);
+    const [childrenCount, setChildrenCount] = useState(comment.childrenCount || 0);
 
     const [activeCommentId, setActiveCommentId] = useState(null);
 
@@ -45,6 +45,14 @@ const Comment = ({ comment }) => {
         setActiveCommentId(commentId);
         // handleReplies(commentId,true);
     }
+
+    // Handle Reply added
+    const handleAddReply = (newReply) => {
+        setReplies(prevReplies => [...prevReplies, newReply]); // Add the new reply to the replies state
+        setExpendedReplies(true); // Ensure the replies are expanded to show the new reply
+        setChildrenCount(prevCount => prevCount + 1); // Increment the children count
+    };
+
     return (
         <div style={{ marginLeft: comment.parentCommentId ? '20px' : '0px' }}>
             <div className="comment-box">
@@ -64,7 +72,7 @@ const Comment = ({ comment }) => {
                     </div>
 
                     {comment._id === activeCommentId && (
-                        <ReplyComment comment={comment} onCancel={() => handleClose()} />
+                        <ReplyComment comment={comment} onCancel={() => handleClose()} onAddReply={handleAddReply} />
                     )}
                     {comment.childrenCount > 0 && <>
                         <div className="comment-replies mt-3">
