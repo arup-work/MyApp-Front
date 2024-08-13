@@ -46,7 +46,7 @@ const Details = () => {
         const result = response.data;
         setComments(result.data.comments);
         setPost(result.data.post);
-        setTotalPage(result.data.totalPage);
+        setTotalPage(result.data.totalPages);
         setTotalComment(result.data.totalComments);
     }
 
@@ -122,12 +122,12 @@ const Details = () => {
     }
 
     // Handle favorite post
-    const handleFavoritePost = async() => {
+    const handleFavoritePost = async () => {
         // const response = await UserService.addFavoritePost(auth, postId);
         if (!isFavorite) {
-            dispatch(addFavoritePost({auth, postId}));
-        }else{
-            dispatch(removeFavoritePost({auth, postId}))
+            dispatch(addFavoritePost({ auth, postId }));
+        } else {
+            dispatch(removeFavoritePost({ auth, postId }))
         }
     }
 
@@ -162,7 +162,7 @@ const Details = () => {
                     <div className="card post">
                         <div className="card-body">
                             <h1 className="post-title">
-                                <span>{ isFavorite ? <img src="/assets/images/star.svg" alt="" onClick={handleFavoritePost} className="favorite-img"/> : <img src="/assets/images/black_star.svg" alt="" onClick={handleFavoritePost} className="favorite-img"/>}</span>
+                                <span>{isFavorite ? <img src="/assets/images/star.svg" alt="" onClick={handleFavoritePost} className="favorite-img" /> : <img src="/assets/images/black_star.svg" alt="" onClick={handleFavoritePost} className="favorite-img" />}</span>
                                 <span>{post.title}</span>
                             </h1>
                             <div className="row mt-3">
@@ -231,7 +231,12 @@ const Details = () => {
                                         </div>
                                     </div>
 
-                                    <CommentList comments={comments} />
+                                    <CommentList
+                                        comments={comments}
+                                        currentCommentsPage={currentPage}
+                                        totalPage={totalPage}
+                                        onPageChange={handlePageChange}
+                                    />
                                 </div>
                                 <Pagination
                                     currentPage={currentPage}

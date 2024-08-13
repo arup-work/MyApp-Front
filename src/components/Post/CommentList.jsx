@@ -9,8 +9,9 @@ import { showConfirmationModal } from "../../helpers/utils/sweetAlertUtils";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Comment from "./Comment";
+import Pagination from "../Pagination";
 
-const CommentList = ({ comments }) => {
+const CommentList = ({ comments, currentPage, totalPage }) => {
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -18,7 +19,7 @@ const CommentList = ({ comments }) => {
     const [commentDetails, setCommentDetails] = useState([]);
     const [replyMode, setReplyMode] = useState(false);
 
-
+    console.log(currentPage, totalPage);
 
     const { auth } = useSelector(state => state.auth);
 
@@ -134,6 +135,7 @@ const CommentList = ({ comments }) => {
                     {comments.length !== index + 1 && <hr />}
                 </div>
             ))}
+            
             {showEditModal && <CommentEditModal show={showEditModal} handleClose={handleClose} commentDetails={commentDetails} replyMode={replyMode} />}
         </div>
     )
