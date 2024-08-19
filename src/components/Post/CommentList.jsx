@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 import Comment from "./Comment";
 import Pagination from "../Pagination";
 
-const CommentList = ({ comments, currentPage, totalPage }) => {
+const CommentList = ({ comments, onReplyAdded }) => {
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -19,7 +19,6 @@ const CommentList = ({ comments, currentPage, totalPage }) => {
     const [commentDetails, setCommentDetails] = useState([]);
     const [replyMode, setReplyMode] = useState(false);
 
-    console.log(currentPage, totalPage);
 
     const { auth } = useSelector(state => state.auth);
 
@@ -131,7 +130,7 @@ const CommentList = ({ comments, currentPage, totalPage }) => {
                         </div>
 
                     </div> */}
-                    <Comment key={comment._id} comment={comment} />
+                    <Comment key={comment._id} comment={comment} onReplyAdded={onReplyAdded}/>
                     {comments.length !== index + 1 && <hr />}
                 </div>
             ))}

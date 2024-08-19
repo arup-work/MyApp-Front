@@ -8,7 +8,7 @@ import CommentService from "../../services/CommentService";
 import ReplyComment from "./ReplyComment";
 
 
-const Comment = ({ comment }) => {
+const Comment = ({ comment, onReplyAdded }) => {
     const [replies, setReplies] = useState([]);
     const [expandedReplies, setExpendedReplies] = useState(false);
     const [expandedNestedReplies, setExpendedNestedReplies] = useState(false);
@@ -47,8 +47,12 @@ const Comment = ({ comment }) => {
     }
 
     // Handle Reply added
-    const handleAddReply = (newReply) => {
-        setReplies(prevReplies => [...prevReplies, newReply]); // Add the new reply to the replies state
+    const handleAddReply = async(commentId) => {
+        const response = await CommentService.fetchComment(auth, commentId);
+        if (response.data.comment.children) {
+            const { children } = response.data.comment;
+            setReplies(children);
+        }
         setExpendedReplies(true); // Ensure the replies are expanded to show the new reply
         setChildrenCount(prevCount => prevCount + 1); // Increment the children count
     };
@@ -72,13 +76,13 @@ const Comment = ({ comment }) => {
                     </div>
 
                     {comment._id === activeCommentId && (
-                        <ReplyComment comment={comment} onCancel={() => handleClose()} onAddReply={handleAddReply} />
+                        <ReplyComment comment={comment} onCancel={() => handleClose()} onAddReply={handleAddReply}/>
                     )}
-                    {comment.childrenCount > 0 && <>
+                    {childrenCount > 0 && <>
                         <div className="comment-replies mt-3">
                             <span onClick={() => handleReplies(comment._id)}>
                                 <FontAwesomeIcon icon={faChevronDown} role="button" className="ms-2 me-2" />
-                                {comment.childrenCount} {comment.childrenCount == 1 ? 'reply' : 'replies'}
+                                {childrenCount} {childrenCount == 1 ? 'reply' : 'replies'}
                             </span>
                         </div>
                     </>}

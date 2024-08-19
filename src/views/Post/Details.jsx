@@ -11,9 +11,11 @@ import { addFavoritePost, removeFavoritePost } from "../../redux/thunks/favorite
 import PostService from "../../services/PostService";
 import '../../assets/styles/PostPage.css';
 import DateFormatter from "../../components/DateFormatter";
-import CommentList from "../../components/Post/CommentList";
+import CommentList from "../../components/Post/CommentList.jsx";
 import CommentService from "../../services/CommentService";
 import Pagination from "../../components/Pagination";
+import { addComment, fetchComments } from "../../redux/thunks/commentsThunks.js";
+import { setCurrentPage } from "../../redux/slices/commentSlice.js";
 
 
 const Details = () => {
@@ -23,32 +25,28 @@ const Details = () => {
     const navigate = useNavigate();
 
     const { postId } = useParams();
-    const [post, setPost] = useState({});
-    const [comments, setComments] = useState([]);
+
     const [viewCount, setViewCount] = useState(0);
     const [comment, setComment] = useState('');
     const [errors, setErrors] = useState({});
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPage, setTotalPage] = useState(1);
-    const [totalComment, setTotalComment] = useState(0);
     const [postsPerPage] = useState(5);
     const [searchedComment, setSearchComment] = useState('');
 
     // const { auth } = useContext(AuthContext);
     const { auth } = useSelector(state => state.auth);
 
-    const favoritePosts = useSelector((state) => state.favorites.favoritePosts) || [];
-    const isFavorite = favoritePosts.some((favPost) => favPost === post._id);
+    // From redux
+    const {reduxPost, 
+        reduxComments, 
+        reduxCurrentPage, 
+        reduxTotalComments , 
+        reduxTotalPages
+    } = useSelector(state => state.comments);
 
-    const fetchPostWithComments = async (searchKey = '') => {
-        const response = await PostService.fetchPostWithComments(auth, postId, currentPage, postsPerPage, searchKey);
-        const result = response.data;
-        setComments(result.data.comments);
-        setPost(result.data.post);
-        setTotalPage(result.data.totalPages);
-        setTotalComment(result.data.totalComments);
-    }
+    const favoritePosts = useSelector((state) => state.favorites.favoritePosts) || [];
+    const isFavorite = favoritePosts.some((favPost) => favPost === reduxPost._id);
+
 
     const incrementViewCount = async () => {
         const response = await PostService.incrementViewCount(auth, postId);
@@ -73,12 +71,8 @@ const Details = () => {
     const handleAddComment = async (e) => {
         e.preventDefault();
         if (validateForm()) {
-            const response = await CommentService.store(auth, postId, { comment });
-            if (response.data) {
-                setComments([response.data.comment, ...comments])
-                setComment('');
-                setTotalComment(response.data.totalComments)
-            }
+            dispatch(addComment({ auth, postId, comment }))
+            setComment('');
         }
     }
 
@@ -102,8 +96,8 @@ const Details = () => {
     }
 
     const handlePageChange = (page) => {
-        if (page >= 1 && page <= totalPage) {
-            setCurrentPage(page);
+        if (page >= 1 && page <= reduxTotalPages) {
+            dispatch(setCurrentPage(page));
         }
     }
 
@@ -113,7 +107,7 @@ const Details = () => {
         handleSearch(value);
     }
     const handleSearch = (searchKey) => {
-        fetchPostWithComments(searchKey);
+        dispatch(fetchComments({auth, postId, reduxCurrentPage, postsPerPage, searchKey}))
     }
 
     const clearSearch = () => {
@@ -131,15 +125,23 @@ const Details = () => {
         }
     }
 
+    // Handle reply comment count
+    const handleReplyAdded = () => {
+        setTotalComments(prevCount => prevCount + 1);
+    };
+
     useEffect(() => {
-        fetchPostWithComments();
         incrementViewCount();
         stateMessage();
-    }, [location.state, location.pathname, navigate, postId, currentPage, postsPerPage])
+    }, [location.state, location.pathname, navigate, postId, reduxCurrentPage, postsPerPage])
+
+    useEffect((searchKey = '') => {
+        dispatch(fetchComments({auth, postId, reduxCurrentPage, postsPerPage, searchKey}))
+    },[reduxCurrentPage])
 
     useEffect(() => {
 
-    }, [comments])
+    }, [reduxComments,reduxTotalPages])
 
     return (
         <div>
@@ -151,7 +153,7 @@ const Details = () => {
                             <li className="breadcrumb-item">
                                 <Link as={Link} to="/post" className="text-decoration-none">Posts</Link>
                             </li>
-                            <li className="breadcrumb-item active" aria-current="page">{post.title}</li>
+                            <li className="breadcrumb-item active" aria-current="page">{reduxPost.title}</li>
                         </ol>
                     </nav>
                 </div>
@@ -163,18 +165,18 @@ const Details = () => {
                         <div className="card-body">
                             <h1 className="post-title">
                                 <span>{isFavorite ? <img src="/assets/images/star.svg" alt="" onClick={handleFavoritePost} className="favorite-img" /> : <img src="/assets/images/black_star.svg" alt="" onClick={handleFavoritePost} className="favorite-img" />}</span>
-                                <span>{post.title}</span>
+                                <span>{reduxPost.title}</span>
                             </h1>
                             <div className="row mt-3">
                                 <div className="col-12">
                                     <div className="row">
                                         <div className="col-4">
                                             <span className="text-muted">Published: </span>
-                                            <DateFormatter date={post.createdAt}></DateFormatter>
+                                            <DateFormatter date={reduxPost.createdAt}></DateFormatter>
                                         </div>
                                         <div className="col-4">
                                             <span className="text-muted">Modified: </span>
-                                            <DateFormatter date={post.modifiedAt}></DateFormatter>
+                                            <DateFormatter date={reduxPost.modifiedAt}></DateFormatter>
                                         </div>
                                         <div className="col-4">
                                             <span className="text-muted">Viewed: </span>
@@ -185,13 +187,13 @@ const Details = () => {
                                 <hr className="mt-2" />
                                 <div className="post-mg mt-2">
                                     <div className="image-container">
-                                        <img src={post.image} alt="image" className="post-img" />
+                                        <img src={reduxPost.image} alt="image" className="post-img" />
                                     </div>
                                 </div>
 
                                 <div className="post-description mx-2 my-3">
                                     <b className="text-muted">Description </b><br />
-                                    {post.description}
+                                    {reduxPost.description}
                                 </div>
                                 <div className="comments-section mt-2">
                                     <h4 className="comments-count mb-4">Your Comments</h4>
@@ -208,7 +210,7 @@ const Details = () => {
                                 <div className="comments-section mt-2">
                                     <div className="row">
                                         <div className="col-8">
-                                            <h4 className="comments-count mb-4">{totalComment} Comments</h4>
+                                            <h4 className="comments-count mb-4">{reduxTotalComments} Comments</h4>
                                         </div>
                                         <div className="col-4 head_search">
 
@@ -232,15 +234,13 @@ const Details = () => {
                                     </div>
 
                                     <CommentList
-                                        comments={comments}
-                                        currentCommentsPage={currentPage}
-                                        totalPage={totalPage}
-                                        onPageChange={handlePageChange}
+                                        comments={reduxComments}
+                                        onReplyAdded={handleReplyAdded}
                                     />
                                 </div>
                                 <Pagination
-                                    currentPage={currentPage}
-                                    totalPage={totalPage}
+                                    currentPage={reduxCurrentPage}
+                                    totalPage={reduxTotalPages}
                                     onPageChange={handlePageChange}
                                 />
                             </div>

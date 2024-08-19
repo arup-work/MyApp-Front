@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import CommentService from "../../services/CommentService";
+import { addComment } from "../../redux/thunks/commentsThunks";
 
 const ReplyComment = ({ comment, onCancel, onAddReply }) => {
+    const dispatch = useDispatch();
     const [replyText, setReplyText] = useState('');
     const [errors, setErrors] = useState({});
 
@@ -33,14 +35,16 @@ const ReplyComment = ({ comment, onCancel, onAddReply }) => {
         e.preventDefault();
         if (validateForm()) {
             try {
-                const response = await CommentService.store(auth, comment.postId, { comment: replyText, parentCommentId: comment._id });
-                const data = response.data;
-                // Pass the new reply data to the parent component
-                onAddReply(data.comment);
-                if (data) {
-                    onCancel();
-                    setReplyText('');
-                }
+               dispatch(addComment({
+                    auth,
+                    postId: comment.postId,
+                    comment: replyText,
+                    parentCommentId: comment._id
+
+                }));
+                onCancel();
+                setReplyText('');
+                onAddReply(comment._id);
             } catch (error) {
                 setErrors('An error occurred. Please try again later.');
             }
