@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { addComment, fetchComments } from "../thunks/commentsThunks";
+import { addComment, fetchComments, updateComment } from "../thunks/commentsThunks";
 
 const commentsSlice = createSlice({
     name: 'comments',
@@ -61,6 +61,16 @@ const commentsSlice = createSlice({
                 state.reduxTotalPages = Math.ceil(state.reduxTotalComments / commentsPerPage);
 
 
+            })
+
+            .addCase(updateComment.fulfilled, (state, action) => {
+                const { comment : newComment } = action.payload;
+               
+                state.reduxComments = state.reduxComments.map(reduxComment =>
+                    reduxComment._id === newComment._id
+                        ? { ...reduxComment, comment: newComment.comment }
+                        : reduxComment
+                );
             })
     }
 })

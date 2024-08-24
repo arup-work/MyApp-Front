@@ -4,15 +4,11 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar } from '@fortawesome/free-solid-svg-icons';
-
 import { addFavoritePost, removeFavoritePost } from "../../redux/thunks/favoriteThunks";
 import PostService from "../../services/PostService";
 import '../../assets/styles/PostPage.css';
 import DateFormatter from "../../components/DateFormatter";
 import CommentList from "../../components/Post/CommentList.jsx";
-import CommentService from "../../services/CommentService";
 import Pagination from "../../components/Pagination";
 import { addComment, fetchComments } from "../../redux/thunks/commentsThunks.js";
 import { setCurrentPage } from "../../redux/slices/commentSlice.js";
@@ -125,11 +121,6 @@ const Details = () => {
         }
     }
 
-    // Handle reply comment count
-    const handleReplyAdded = () => {
-        setTotalComments(prevCount => prevCount + 1);
-    };
-
     useEffect(() => {
         incrementViewCount();
         stateMessage();
@@ -235,7 +226,6 @@ const Details = () => {
 
                                     <CommentList
                                         comments={reduxComments}
-                                        onReplyAdded={handleReplyAdded}
                                     />
                                 </div>
                                 <Pagination

@@ -193,14 +193,23 @@
     margin-top: 10px;
 }
 
+.comment-actions .action-buttons {
+    display: flex;
+    align-items: center;
+    margin-left: auto; /* Pushes the buttons to the right */
+}
+
+.edit-icon {
+    color: #065fd4;; /* Change this to the desired color */
+}
+.delete-icon {
+    color: hsl(9, 94%, 43%); /* Change this to the desired color */
+}
+
 .comment-actions button {
     margin-right: 10px;
 }
 
-.comment-actions button .fa-icon {
-    background-color: white;
-    /* Set icon color */
-}
 
 .comment-replies span {
     color: #065fd4;
