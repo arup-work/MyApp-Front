@@ -124,7 +124,7 @@ const Comment = ({ comment, onReplyAdded }) => {
       dispatch(updateComment({ auth, commentId, comment: editText }));
       setEditMode(null);
     }
-    
+
   }
 
   return (
@@ -145,9 +145,9 @@ const Comment = ({ comment, onReplyAdded }) => {
             </small>
           </div>
           {ediMode === comment._id ? <div className="reply-content">
-            <textarea rows="3" placeholder="Add a public comment..." onChange={e => setEditText(e.target.value )} value={editText}></textarea>
+            <textarea rows="3" placeholder="Add a public comment..." onChange={e => setEditText(e.target.value)} value={editText}></textarea>
             {errors.comment && <span className="text-danger m-2">{errors.comment}</span>}
-          </div> : <div>{comment.comment}</div>}
+          </div> : <>{comment.comment}</>}
 
           <div className="comment-actions">
             <img src="/assets/images/like.svg" alt="like" />
@@ -158,19 +158,23 @@ const Comment = ({ comment, onReplyAdded }) => {
             >
               Reply
             </button>
-            {ediMode === comment._id ? <div className="reply-actions">
-              <button className="btn btn-light cancel-btn" onClick={() => handleCancelEdit(comment._id, comment.comment)}>
-                Cancel
-              </button>
-              <button className="btn btn-primary reply-btn" onClick={() => handleUpdateComment(comment._id)}>
-                Update
-              </button>
-            </div> : <>{auth.user.id == comment.userId._id && (
+            {ediMode === comment._id ?
               <div className="action-buttons">
-                <FontAwesomeIcon icon={faEdit} className="edit-icon" onClick={() => handleEditClick(comment._id, comment.comment)} />
-                <FontAwesomeIcon icon={faTrashAlt} className="ms-2 delete-icon" />
+                <div className="reply-actions">
+                  <button className="btn btn-light cancel-btn" onClick={() => handleCancelEdit(comment._id, comment.comment)}>
+                    Cancel
+                  </button>
+                  <button className="btn btn-primary reply-btn" onClick={() => handleUpdateComment(comment._id)}>
+                    Update
+                  </button>
+                </div>
               </div>
-            )}</>}
+              : <>{auth.user.id == comment.userId._id && (
+                <div className="action-buttons">
+                  <FontAwesomeIcon icon={faEdit} className="edit-icon" onClick={() => handleEditClick(comment._id, comment.comment)} role="button" />
+                  <FontAwesomeIcon icon={faTrashAlt} className="ms-2 delete-icon" role="button" />
+                </div>
+              )}</>}
           </div>
 
           {comment._id === activeCommentId && (
