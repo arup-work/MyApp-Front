@@ -9,7 +9,7 @@ const commentsSlice = createSlice({
         reduxPost: {},
         reduxCurrentPage: 1,
         reduxTotalPages: 1,
-        commentsPerPage:5,
+        commentsPerPage: 5,
         status: 'idle',
         error: null
     },
@@ -48,7 +48,7 @@ const commentsSlice = createSlice({
                     // If it's a new comment (not a reply), prepend it to the list
                     state.reduxComments = [comment, ...state.reduxComments];
 
-                     // If the number of comments exceeds the limit per page, remove the last comment
+                    // If the number of comments exceeds the limit per page, remove the last comment
                     if (state.reduxComments.length > commentsPerPage) {
                         state.reduxComments.pop();  // Remove the oldest comment to maintain the limit
                     }
@@ -64,14 +64,40 @@ const commentsSlice = createSlice({
             })
 
             .addCase(updateComment.fulfilled, (state, action) => {
-                const { comment : newComment } = action.payload;
-               
-                state.reduxComments = state.reduxComments.map(reduxComment =>
-                    reduxComment._id === newComment._id
-                        ? { ...reduxComment, comment: newComment.comment }
-                        : reduxComment
-                );
-            })
+                const { comment: updatedComment } = action.payload;
+            
+                // Check if the updated comment has a parentCommentId
+                if (updatedComment.parentCommentId) {
+                    // It's a child comment, find its parent in reduxComments
+                    state.reduxComments = state.reduxComments.map((reduxComment) => {
+                        // Find the parent comment to which this child belongs
+                        if (reduxComment._id === updatedComment.parentCommentId) {
+                            // Update the local state where the children have been fetched and are stored
+                            return {
+                                ...reduxComment,
+                                // Here we assume that if children have been fetched, they're stored in a 'children' array
+                                children: reduxComment.children 
+                                    ? reduxComment.children.map((childComment) =>
+                                          childComment._id === updatedComment._id
+                                              ? { ...childComment, comment: updatedComment.comment }
+                                              : childComment
+                                      )
+                                    : reduxComment.children, // If children haven't been fetched yet, leave as is
+                            };
+                        }
+                        return reduxComment; // Return unchanged parent comment
+                    });
+                } else {
+                    // It's a parent comment, update it directly
+                    state.reduxComments = state.reduxComments.map((reduxComment) =>
+                        reduxComment._id === updatedComment._id
+                            ? { ...reduxComment, comment: updatedComment.comment }
+                            : reduxComment
+                    );
+                }
+            });
+            
+
     }
 })
 

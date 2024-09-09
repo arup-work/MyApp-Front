@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -22,17 +22,16 @@ import { updateComment } from "../../redux/thunks/commentsThunks";
 const Comment = ({ comment, onReplyAdded }) => {
   const dispatch = useDispatch();
   const [errors, setErrors] = useState({});
-  // State variables to manage the replies and their visibility
-  const [replies, setReplies] = useState([]); // State variable to store the replies of the comment
-  const [expandedReplies, setExpendedReplies] = useState(false); // State variable to toggle the visibility of the replies
-  const [expandedNestedReplies, setExpendedNestedReplies] = useState(false); // State variable to toggle the visibility of the nested replies
+  const [replies, setReplies] = useState([]);
+  const [expandedReplies, setExpendedReplies] = useState(false);
+  const [expandedNestedReplies, setExpendedNestedReplies] = useState(false);
   const [childrenCount, setChildrenCount] = useState(
     comment.childrenCount || 0
   ); // State variable to track the number of children comments
 
   const [activeCommentId, setActiveCommentId] = useState(null); // State variable to track the active comment to display the reply box
 
-  const [ediMode, setEditMode] = useState(false); // State variable to track the edit mode
+  const [editMode, setEditMode] = useState(false); // State variable to track the edit mode
   const [editText, setEditText] = useState(""); // State variable to track the edited text
 
   const { auth } = useSelector((state) => state.auth); // Auth object from the Redux store
@@ -56,6 +55,9 @@ const Comment = ({ comment, onReplyAdded }) => {
       if (response.data.comment.children) {
         const { children } = response.data.comment;
         setReplies(children);
+
+        // Directly handle updates using fetched children data
+        handleUpdateComment(commentId, children); // Pass children to the update function
       }
     }
   };
@@ -119,13 +121,39 @@ const Comment = ({ comment, onReplyAdded }) => {
     return !Object.keys(newErrors).length;
   }
 
-  const handleUpdateComment = (commentId) => {
+  const handleUpdateComment = async (commentId) => {
     if (validateForm(editText)) {
-      dispatch(updateComment({ auth, commentId, comment: editText }));
+      await dispatch(updateComment({ auth, commentId, comment: editText }));
+      console.log("Replies before fetch or update:", replies);
+
+      // Re-fetch the updated child comment after update if currently viewing replies
+      const updatedResponse = await CommentService.fetchComment(auth, commentId);
+      if (updatedResponse.data.comment) {
+        const updatedComment = updatedResponse.data.comment;
+
+        // Check if the comment is a child comment by checking if it has a parentCommentId
+        if (updatedComment.parentCommentId) {
+          // Update local replies state only if replies have been fetched and are not empty
+          setReplies((prevReplies) => {
+            // Ensure replies are not empty before trying to update them
+            console.log(prevReplies);
+
+            if (prevReplies.length > 0) {
+              console.log("hii");
+
+              return prevReplies.map((reply) =>
+                reply._id === updatedComment._id ? updatedComment : reply
+              );
+            }
+            // If replies are empty, fetch and set the replies
+            return prevReplies;
+          });
+        }
+      }
+
       setEditMode(null);
     }
-
-  }
+  };
 
   return (
     <div style={{ marginLeft: comment.parentCommentId ? "20px" : "0px" }}>
@@ -144,7 +172,7 @@ const Comment = ({ comment, onReplyAdded }) => {
               <DateFormatter date={comment.createdAt} />
             </small>
           </div>
-          {ediMode === comment._id ? <div className="reply-content">
+          {editMode === comment._id ? <div className="reply-content">
             <textarea rows="3" placeholder="Add a public comment..." onChange={e => setEditText(e.target.value)} value={editText}></textarea>
             {errors.comment && <span className="text-danger m-2">{errors.comment}</span>}
           </div> : <>{comment.comment}</>}
@@ -158,7 +186,7 @@ const Comment = ({ comment, onReplyAdded }) => {
             >
               Reply
             </button>
-            {ediMode === comment._id ?
+            {editMode === comment._id ?
               <div className="action-buttons">
                 <div className="reply-actions">
                   <button className="btn btn-light cancel-btn" onClick={() => handleCancelEdit(comment._id, comment.comment)}>
