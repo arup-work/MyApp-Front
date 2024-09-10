@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { addComment, fetchComments, updateComment } from "../thunks/commentsThunks";
+import { addComment, deletedComment, fetchComments, updateComment } from "../thunks/commentsThunks";
+import { toast } from "react-toastify";
 
 const commentsSlice = createSlice({
     name: 'comments',
@@ -27,7 +28,7 @@ const commentsSlice = createSlice({
                 state.reduxTotalPages = action.payload.totalPages;
             })
             .addCase(addComment.fulfilled, (state, action) => {
-                const { comment } = action.payload;
+                const { comment,message } = action.payload;
                 const commentsPerPage = state.commentsPerPage; // Ensure commentsPerPage is available in the state
 
                 // Check if the comment is a reply
@@ -59,13 +60,17 @@ const commentsSlice = createSlice({
 
                 // Recalculate total pages
                 state.reduxTotalPages = Math.ceil(state.reduxTotalComments / commentsPerPage);
+                toast.success(message, {
+                    position: 'top-right',
+                    className: 'foo-bar'
+                });
 
 
             })
 
             .addCase(updateComment.fulfilled, (state, action) => {
-                const { comment: updatedComment } = action.payload;
-            
+                const { comment: updatedComment, message } = action.payload;
+
                 // Check if the updated comment has a parentCommentId
                 if (updatedComment.parentCommentId) {
                     // It's a child comment, find its parent in reduxComments
@@ -76,12 +81,12 @@ const commentsSlice = createSlice({
                             return {
                                 ...reduxComment,
                                 // Here we assume that if children have been fetched, they're stored in a 'children' array
-                                children: reduxComment.children 
+                                children: reduxComment.children
                                     ? reduxComment.children.map((childComment) =>
-                                          childComment._id === updatedComment._id
-                                              ? { ...childComment, comment: updatedComment.comment }
-                                              : childComment
-                                      )
+                                        childComment._id === updatedComment._id
+                                            ? { ...childComment, comment: updatedComment.comment }
+                                            : childComment
+                                    )
                                     : reduxComment.children, // If children haven't been fetched yet, leave as is
                             };
                         }
@@ -95,8 +100,48 @@ const commentsSlice = createSlice({
                             : reduxComment
                     );
                 }
-            });
-            
+                toast.success(message, {
+                    position: 'top-right',
+                    className: 'foo-bar'
+                });
+            })
+
+            .addCase(deletedComment.fulfilled, (state, action) => {
+                const { comment,deletedCommentCount } = action.payload;
+                const commentsPerPage = state.commentsPerPage; // Ensure commentsPerPage is available in the state
+
+                // Check if the comment is a reply
+                if (comment.parentCommentId) {
+                    // Find the parent comment in the list
+                    const parentComment = state.reduxComments.find(
+                        eachComment => eachComment._id === comment._id
+                    );
+
+                    if (parentComment) {
+                        // Remove the reply from the parent comment's replies array
+                        parentComment.replies = parentComment.replies.filter((
+                            reply => reply._id !== comment._id
+                        ))
+                    }
+                } else {
+                    // If it's a parent comment, remove it from the reduxComments list
+                    state.reduxComments = state.reduxComments.filter(
+                        eachComment => eachComment._id !== comment._id
+                    );
+                }
+
+                // Increase the total comment count
+                state.reduxTotalComments -= deletedCommentCount;
+
+                // Recalculate total pages
+                state.reduxTotalPages = Math.ceil(state.reduxTotalComments / commentsPerPage);
+
+
+            })
+
+
+
+
 
     }
 })

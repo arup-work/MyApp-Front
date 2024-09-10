@@ -6,25 +6,28 @@ import {
   faEdit,
   faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
 
 import DateFormatter from "../DateFormatter";
 import CommentService from "../../services/CommentService";
 import ReplyComment from "./ReplyComment";
-import { updateComment } from "../../redux/thunks/commentsThunks";
+import { updateComment, deletedComment } from "../../redux/thunks/commentsThunks";
+import { showConfirmationModal } from "../../helpers/utils/sweetAlertUtils";
+import { useNavigate } from "react-router-dom";
 
 /**
  * Comment component to display a comment and its replies
  * @param {Object} props - The properties passed to the component
  * @param {Object} props.comment - The comment object
- * @param {Function} props.onReplyAdded - The function to call when a reply is added
  * @returns {JSX.Element} The Comment component
  */
-const Comment = ({ comment, onReplyAdded }) => {
+const Comment = ({ comment, collapseDropdown }) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [errors, setErrors] = useState({});
   const [replies, setReplies] = useState([]);
   const [expandedReplies, setExpendedReplies] = useState(false);
-  const [expandedNestedReplies, setExpendedNestedReplies] = useState(false);
   const [childrenCount, setChildrenCount] = useState(
     comment.childrenCount || 0
   ); // State variable to track the number of children comments
@@ -36,18 +39,16 @@ const Comment = ({ comment, onReplyAdded }) => {
 
   const { auth } = useSelector((state) => state.auth); // Auth object from the Redux store
 
+  const [commentTittle, setCommentTitle] = useState(comment?.comment || '');
+
   /**
    * Handles the reply action for a comment
    * @param {string} commentId - The ID of the comment
    * @param {boolean} isNested - Flag indicating if the comment is nested
    */
-  const handleReplies = async (commentId, isNested = false) => {
+  const handleReplies = async (commentId) => {
     // Toggle the visibility of the nested replies
-    if (isNested) {
-      setExpendedNestedReplies((prevState) => !prevState);
-    } else {
-      setExpendedReplies((prevState) => !prevState);
-    }
+    setExpendedReplies((prevState) => !prevState);
 
     // Fetch the children comments if the replies are not expanded
     if (!expandedReplies) {
@@ -81,7 +82,7 @@ const Comment = ({ comment, onReplyAdded }) => {
 
   /**
    * Handles the reply action for a comment. Fetches the children comments,
-   * expands the replies, increments the children count and calls the onReplyAdded function.
+   * expands the replies, increments the children count and calls th function.
    * @param {string} commentId - The ID of the comment
    * @returns {Promise<void>}
    */
@@ -93,7 +94,6 @@ const Comment = ({ comment, onReplyAdded }) => {
     }
     setExpendedReplies(true); // Ensure the replies are expanded to show the new reply
     setChildrenCount((prevCount) => prevCount + 1); // Increment the children count
-    onReplyAdded();
   };
 
   const handleEditClick = (commentId, commentText) => {
@@ -123,37 +123,50 @@ const Comment = ({ comment, onReplyAdded }) => {
 
   const handleUpdateComment = async (commentId) => {
     if (validateForm(editText)) {
-      await dispatch(updateComment({ auth, commentId, comment: editText }));
-      console.log("Replies before fetch or update:", replies);
+      const response = await dispatch(updateComment({ auth, commentId, comment: editText }));
 
-      // Re-fetch the updated child comment after update if currently viewing replies
-      const updatedResponse = await CommentService.fetchComment(auth, commentId);
-      if (updatedResponse.data.comment) {
-        const updatedComment = updatedResponse.data.comment;
-
-        // Check if the comment is a child comment by checking if it has a parentCommentId
-        if (updatedComment.parentCommentId) {
-          // Update local replies state only if replies have been fetched and are not empty
-          setReplies((prevReplies) => {
-            // Ensure replies are not empty before trying to update them
-            console.log(prevReplies);
-
-            if (prevReplies.length > 0) {
-              console.log("hii");
-
-              return prevReplies.map((reply) =>
-                reply._id === updatedComment._id ? updatedComment : reply
-              );
-            }
-            // If replies are empty, fetch and set the replies
-            return prevReplies;
-          });
-        }
-      }
-
+      setCommentTitle(response.payload.comment.comment);
+      const topMostParentCommentId = response.payload.topMostParentCommentId;
       setEditMode(null);
     }
   };
+
+  const deleteComment = async (commentId, postId) => {
+    const result = await showConfirmationModal('Delete Comment', 'Are you sure you want to delete this comment?');
+    if (result.isConfirmed) {
+      try {
+        // Dispatch delete action
+        const response = await dispatch(deletedComment({ auth, commentId }));
+        const updatedComment = response.payload.comment;
+
+        // If it's a reply, remove it from the replies list
+
+        if (updatedComment.parentCommentId) {
+          setExpendedReplies(false);
+        } else {
+          // Navigate to another route or modify the reduxComments in parent
+          navigate(`/post/${postId}`, {
+            state: {
+              message: 'Comment deleted successfully',
+              type: 'success'
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Failed to delete comment:", error);
+      }
+    }
+    if (collapseDropdown) {
+      collapseDropdown();
+    }
+  };
+
+  const collapseDropdownClick =  () => {
+    setExpendedReplies(false);
+    setChildrenCount((prevCount) => prevCount - 1);
+  }
+
+
 
   return (
     <div style={{ marginLeft: comment.parentCommentId ? "20px" : "0px" }}>
@@ -175,7 +188,7 @@ const Comment = ({ comment, onReplyAdded }) => {
           {editMode === comment._id ? <div className="reply-content">
             <textarea rows="3" placeholder="Add a public comment..." onChange={e => setEditText(e.target.value)} value={editText}></textarea>
             {errors.comment && <span className="text-danger m-2">{errors.comment}</span>}
-          </div> : <>{comment.comment}</>}
+          </div> : <>{commentTittle}</>}
 
           <div className="comment-actions">
             <img src="/assets/images/like.svg" alt="like" />
@@ -199,8 +212,8 @@ const Comment = ({ comment, onReplyAdded }) => {
               </div>
               : <>{auth.user.id == comment.userId._id && (
                 <div className="action-buttons">
-                  <FontAwesomeIcon icon={faEdit} className="edit-icon" onClick={() => handleEditClick(comment._id, comment.comment)} role="button" />
-                  <FontAwesomeIcon icon={faTrashAlt} className="ms-2 delete-icon" role="button" />
+                  <FontAwesomeIcon icon={faEdit} className="edit-icon" onClick={() => handleEditClick(comment._id, commentTittle)} role="button" />
+                  <FontAwesomeIcon icon={faTrashAlt} className="ms-2 delete-icon" role="button" onClick={() => deleteComment(comment._id, comment.postId)} />
                 </div>
               )}</>}
           </div>
@@ -226,34 +239,10 @@ const Comment = ({ comment, onReplyAdded }) => {
               </div>
             </>
           )}
-          {comment.children && comment.children.length > 0 && (
-            <>
-              <div className="comment-replies mt-3">
-                <span onClick={() => handleReplies(comment._id)}>
-                  <FontAwesomeIcon
-                    icon={faChevronDown}
-                    role="button"
-                    className="ms-2 me-2"
-                  />
-                  {comment.children.length}{" "}
-                  {comment.children.length == 1 ? "reply" : "replies"}
-                </span>
-              </div>
-            </>
-          )}
-          {expandedNestedReplies &&
-            comment.children &&
-            comment.children.length > 0 && (
-              <div className="expender-contents mt-3">
-                {comment.children.map((child) => (
-                  <Comment key={child._id} comment={child} />
-                ))}
-              </div>
-            )}
           {expandedReplies && (
             <div className="expender-contents mt-3">
               {replies.map((reply) => (
-                <Comment key={reply._id} comment={reply} />
+                <Comment key={reply._id} comment={reply} collapseDropdown={collapseDropdownClick}/>
               ))}
             </div>
           )}

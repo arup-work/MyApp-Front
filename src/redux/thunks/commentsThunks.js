@@ -40,3 +40,16 @@ export const updateComment = createAsyncThunk(
         }
     }
 )
+
+export const deletedComment  = createAsyncThunk(
+    'comments/deleteCOmment',
+    async({ auth, commentId}, {rejectWithValue}) => {
+        try {
+            const bearerToken = { 'Authorization': `Bearer ${auth.token}`};
+            const response = await apiRequest(`comment/${commentId}`,'DELETE',null, bearerToken);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+)
