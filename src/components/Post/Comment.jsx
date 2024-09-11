@@ -4,6 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronDown,
   faEdit,
+  faThumbsDown,
+  faThumbsUp,
   faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import Button from 'react-bootstrap/Button';
@@ -40,6 +42,10 @@ const Comment = ({ comment, collapseDropdown }) => {
   const { auth } = useSelector((state) => state.auth); // Auth object from the Redux store
 
   const [commentTittle, setCommentTitle] = useState(comment?.comment || '');
+
+  // Track whether the user has liked the comment
+  const [isLiked, setIsLiked] = useState(comment.likes.includes(auth.user.id)); // Initial like state
+  const [likesCount, setLikesCount] = useState(comment.likes.length); // Initialize likes count
 
   /**
    * Handles the reply action for a comment
@@ -161,11 +167,22 @@ const Comment = ({ comment, collapseDropdown }) => {
     }
   };
 
-  const collapseDropdownClick =  () => {
+  const collapseDropdownClick = () => {
     setExpendedReplies(false);
     setChildrenCount((prevCount) => prevCount - 1);
   }
 
+  const handleLikeComment = async (commentId) => {
+      await CommentService.likeComment(auth, commentId);
+      if (isLiked) {
+        setIsLiked(false);
+        setLikesCount(likesCount - 1);
+      } else {
+        setIsLiked(true);
+        setLikesCount(likesCount + 1);
+      }
+   
+  }
 
 
   return (
@@ -191,7 +208,15 @@ const Comment = ({ comment, collapseDropdown }) => {
           </div> : <>{commentTittle}</>}
 
           <div className="comment-actions">
-            <img src="/assets/images/like.svg" alt="like" />
+            <a onClick={() => handleLikeComment(comment._id)}>
+              {isLiked ? (
+                <FontAwesomeIcon icon={faThumbsUp} className="like-icon" />
+              ) : (
+                <img src="/assets/images/like.svg" alt="like" />
+              )}
+            </a>
+            <span>{likesCount > 0 && likesCount}</span>
+
             <button
               className="btn btn-outline-secondary btn-sm ms-2"
               onClick={() => handleReplyClick(comment._id)}
@@ -242,7 +267,7 @@ const Comment = ({ comment, collapseDropdown }) => {
           {expandedReplies && (
             <div className="expender-contents mt-3">
               {replies.map((reply) => (
-                <Comment key={reply._id} comment={reply} collapseDropdown={collapseDropdownClick}/>
+                <Comment key={reply._id} comment={reply} collapseDropdown={collapseDropdownClick} />
               ))}
             </div>
           )}
