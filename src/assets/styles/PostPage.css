@@ -281,3 +281,16 @@
     font-size: 14px;
     border-radius: 20px;
 }
+
+.reply-textarea {
+    border: 1px solid #ccc;     
+    padding: 10px;             
+    min-height: 70px;            
+    border-radius: 4px;          
+    white-space: pre-wrap;      
+    overflow-y: auto;            
+    resize: vertical;          
+    outline: none;             
+    width: 100%;                
+    font: inherit;         
+}

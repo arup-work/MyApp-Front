@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CommentService from "../../services/CommentService";
 import { addComment } from "../../redux/thunks/commentsThunks";
@@ -7,8 +7,10 @@ const ReplyComment = ({ comment, onCancel, onAddReply }) => {
     const dispatch = useDispatch();
     const [replyText, setReplyText] = useState('');
     const [errors, setErrors] = useState({});
+    const textRef = useRef(null);
 
-    const {auth} = useSelector(state => state.auth);
+
+    const { auth } = useSelector(state => state.auth);
 
     // Clear the text area and close the section
     const handleClearReply = () => {
@@ -35,7 +37,7 @@ const ReplyComment = ({ comment, onCancel, onAddReply }) => {
         e.preventDefault();
         if (validateForm()) {
             try {
-               dispatch(addComment({
+                dispatch(addComment({
                     auth,
                     postId: comment.postId,
                     comment: replyText,
@@ -50,13 +52,39 @@ const ReplyComment = ({ comment, onCancel, onAddReply }) => {
             }
         }
     }
+
+
+
+    useEffect(() => {
+        if (comment && comment.userId && comment.userId.name) {
+            setReplyText(`@${comment.userId.name} `);
+        }
+    }, [comment]);
+
+
+    const handleInput = (e) => {
+        setReplyText(e.target.innerText);
+    };
+
+    useEffect(() => {
+        if (textRef.current && comment.userId.name) {
+            const userNameSpan = `<span style="color: blue;">@${comment.userId.name}</span>&nbsp;`;
+            textRef.current.innerHTML = userNameSpan;  // Inject styled username
+        }
+    }, [textRef, comment]);
+
     return (
         <div className="comment-reply-box mt-2">
             <div className="comment-avatar">
                 <img src="/assets/images/avatar.png" alt="Avatar" className="rounded-circle" />
             </div>
             <div className="reply-content">
-                <textarea rows="3" placeholder="Add a public comment..." onChange={e => setReplyText(e.target.value)} value={replyText}></textarea>
+                <div
+                    ref={textRef}
+                    contentEditable
+                    className="reply-textarea"
+                    onInput={handleInput}
+                ></div>
                 {errors.replyText && <span className="text-danger m-2">{errors.replyText}</span>}
                 <div className="reply-actions">
                     <button className="btn btn-light cancel-btn" onClick={handleClearReply}>

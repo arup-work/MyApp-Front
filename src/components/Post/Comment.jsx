@@ -203,7 +203,7 @@ const Comment = ({ comment, collapseDropdown }) => {
             </small>
           </div>
           {editMode === comment._id ? <div className="reply-content">
-            <textarea rows="3" placeholder="Add a public comment..." onChange={e => setEditText(e.target.value)} value={editText}></textarea>
+            <textarea rows="3" placeholder="Add a public comment2..." onChange={e => setEditText(e.target.value)} value={editText}></textarea>
             {errors.comment && <span className="text-danger m-2">{errors.comment}</span>}
           </div> : <>{commentTittle}</>}
 
